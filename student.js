@@ -1,13 +1,13 @@
 // ==========================================================================
 // LATIHAN TKA BAHASA INGGRIS SMA 2025 PILIHAN
-// STUDENT MODE JAVASCRIPT ENGINE (student.js)
-// 100% Offline, Touch-Safe, Mobile-First, SafeStorage & Self-Correction Enabled
+// STUDENT MODE JAVASCRIPT ENGINE (student.js v3.0)
+// 100% Offline, Touch-Safe, Mobile-First, SafeStorage & Self-Correction
 // ==========================================================================
 
-const STUDENT_STORAGE_KEY = 'tka_english_2025_pilihan_student_v2';
+const STUDENT_STORAGE_KEY = 'tka_english_2025_pilihan_student_v3';
 const THEME_KEY = 'tka_english_2025_theme';
 
-// SafeStorage Wrapper with in-memory fallback for file:// and sandboxes
+// SafeStorage Wrapper with in-memory fallback
 window._memoryStorage = window._memoryStorage || {};
 const SafeStorage = {
   getItem(key) {
@@ -43,6 +43,34 @@ const SafeStorage = {
   }
 };
 window.SafeStorage = SafeStorage;
+
+// Safe Data Getters to guarantee zero crashes
+function getMasterQuestions() {
+  if (typeof MASTER_QUESTIONS !== 'undefined' && Array.isArray(MASTER_QUESTIONS) && MASTER_QUESTIONS.length > 0) return MASTER_QUESTIONS;
+  if (typeof ALL_QUESTIONS !== 'undefined' && Array.isArray(ALL_QUESTIONS) && ALL_QUESTIONS.length > 0) return ALL_QUESTIONS;
+  if (typeof QUESTIONS !== 'undefined' && Array.isArray(QUESTIONS)) {
+    let q = [...QUESTIONS];
+    if (typeof QUESTIONS_11_20 !== 'undefined' && Array.isArray(QUESTIONS_11_20)) q.push(...QUESTIONS_11_20);
+    if (typeof QUESTIONS_21_30 !== 'undefined' && Array.isArray(QUESTIONS_21_30)) q.push(...QUESTIONS_21_30);
+    return q;
+  }
+  return [];
+}
+
+function getPassages() {
+  if (typeof PASSAGES !== 'undefined' && Array.isArray(PASSAGES) && PASSAGES.length > 0) return PASSAGES;
+  return [];
+}
+
+function getVocabulary() {
+  if (typeof VOCABULARY !== 'undefined' && Array.isArray(VOCABULARY) && VOCABULARY.length > 0) return VOCABULARY;
+  return [];
+}
+
+function getStrategies() {
+  if (typeof STRATEGIES !== 'undefined' && Array.isArray(STRATEGIES) && STRATEGIES.length > 0) return STRATEGIES;
+  return [];
+}
 
 // Application State
 const StudentState = {
@@ -80,22 +108,21 @@ const StudentState = {
   vocabSearchQuery: ''
 };
 
-
 // ==========================================
-// ROBUST INITIALIZATION (PREVENT RACE CONDITION)
+// INITIALIZATION
 // ==========================================
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initStudentApp);
-} else {
-  initStudentApp();
-}
-
-
 function initStudentApp() {
   loadStudentTheme();
   loadStudentData();
   setupStudentEvents();
   renderStudentApp();
+}
+
+// Auto-run on all browsers safely
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initStudentApp);
+} else {
+  initStudentApp();
 }
 
 function loadStudentTheme() {
@@ -128,12 +155,9 @@ function applyStudentTheme(theme) {
 function loadStudentData() {
   try {
     let raw = SafeStorage.getItem(STUDENT_STORAGE_KEY);
-    if (!raw) {
-      raw = SafeStorage.getItem('tka_english_2025_pilihan_student');
-    }
-    if (!raw) {
-      raw = SafeStorage.getItem('tka_english_2025_pilihan_student_v2');
-    }
+    if (!raw) raw = SafeStorage.getItem('tka_english_2025_pilihan_student_v2');
+    if (!raw) raw = SafeStorage.getItem('tka_english_2025_pilihan_student');
+    
     if (raw) {
       const data = JSON.parse(raw);
       if (data.profile) StudentState.profile = { ...StudentState.profile, ...data.profile };
@@ -186,11 +210,21 @@ function saveStudentProfile() {
   if (teacherInput) StudentState.profile.teacher = teacherInput.value.trim();
 
   saveStudentData();
-  showStudentToast('✅ Student Profile Saved!');
+  showStudentToast('✅ Profile saved!');
 }
 
 function setupStudentEvents() {
-  // Global shortcut or resize handlers if needed
+  // Safe listener for window resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      const readPanel = document.getElementById('student-reading-panel');
+      const quizPanel = document.getElementById('student-practice-panel');
+      if (readPanel) readPanel.style.display = '';
+      if (quizPanel) quizPanel.style.display = '';
+    } else {
+      setMobileViewTab(StudentState.mobileActiveTab || 'read');
+    }
+  });
 }
 
 // ==========================================
@@ -252,6 +286,9 @@ function renderStudentApp() {
 // 1. DASHBOARD VIEW
 // ==========================================
 function renderStudentDashboard() {
+  const masterQ = getMasterQuestions();
+  const passages = getPassages();
+
   const answeredCount = Object.keys(StudentState.answers).filter(qId => {
     const rec = StudentState.answers[qId];
     return rec && rec.answer !== undefined && rec.answer !== null && rec.answer !== '' && (!Array.isArray(rec.answer) || rec.answer.length > 0);
@@ -262,7 +299,7 @@ function renderStudentDashboard() {
     return rec && rec.reason && rec.reason.trim().length > 3;
   }).length;
 
-  const totalQuestions = (typeof MASTER_QUESTIONS !== 'undefined' ? MASTER_QUESTIONS.length : 30);
+  const totalQuestions = masterQ.length || 30;
   const progressPct = Math.round((answeredCount / totalQuestions) * 100);
 
   const elAns = document.getElementById('student-stat-answered');
@@ -275,16 +312,17 @@ function renderStudentDashboard() {
 
   // Render Passages Grid
   const cardsContainer = document.getElementById('student-dashboard-cards');
-  if (!cardsContainer || typeof PASSAGES === 'undefined') return;
+  if (!cardsContainer) return;
 
   cardsContainer.innerHTML = '';
-  PASSAGES.forEach(pass => {
-    // Count questions for this text
-    const textQuestions = MASTER_QUESTIONS.filter(q => q.textId === pass.id);
+  passages.forEach(pass => {
+    const textQuestions = masterQ.filter(q => q.textId === pass.id);
     const textAnswered = textQuestions.filter(q => {
       const rec = StudentState.answers[q.id];
       return rec && rec.answer !== undefined && rec.answer !== null && rec.answer !== '' && (!Array.isArray(rec.answer) || rec.answer.length > 0);
     }).length;
+
+    const firstParagraph = pass.text ? pass.text.split('\n')[0].substring(0, 130) : '';
 
     const card = document.createElement('div');
     card.className = 'text-card';
@@ -294,7 +332,7 @@ function renderStudentDashboard() {
       <div class="text-card-tag">READING TEXT 0${pass.number}</div>
       <h4 class="text-card-title">${pass.title}</h4>
       <p class="text-card-desc" style="font-size:0.88rem; color:var(--text-muted); line-height:1.5; margin-bottom:14px;">
-        ${pass.text.split('\n')[0].substring(0, 130)}...
+        ${firstParagraph}...
       </p>
       <div class="text-card-footer">
         <span class="text-card-progress">${textAnswered}/${textQuestions.length} Answered</span>
@@ -307,8 +345,9 @@ function renderStudentDashboard() {
 
 function openStudentWorkspace(textNumber) {
   StudentState.selectedTextId = textNumber;
+  const masterQ = getMasterQuestions();
   const targetTextId = `text-${textNumber}`;
-  const firstQIndex = MASTER_QUESTIONS.findIndex(q => q.textId === targetTextId);
+  const firstQIndex = masterQ.findIndex(q => q.textId === targetTextId);
   if (firstQIndex !== -1) {
     StudentState.currentQuestionIndex = firstQIndex;
   }
@@ -319,15 +358,20 @@ function openStudentWorkspace(textNumber) {
 // 2. STUDENT WORKSPACE VIEW
 // ==========================================
 function renderStudentWorkspace() {
-  const currentQ = MASTER_QUESTIONS[StudentState.currentQuestionIndex];
+  const masterQ = getMasterQuestions();
+  const passages = getPassages();
+
+  if (masterQ.length === 0) return;
+
+  const currentQ = masterQ[StudentState.currentQuestionIndex] || masterQ[0];
   if (!currentQ) return;
 
-  const matchNum = currentQ.textId.match(/\d+/);
+  const matchNum = currentQ.textId ? currentQ.textId.match(/\d+/) : null;
   if (matchNum) {
     StudentState.selectedTextId = parseInt(matchNum[0], 10);
   }
 
-  const currentPassage = PASSAGES.find(p => p.id === currentQ.textId) || PASSAGES[0];
+  const currentPassage = passages.find(p => p.id === currentQ.textId) || passages[0] || { number: 1, title: 'Reading Passage', text: '', source: '' };
 
   // Title
   const wsTitle = document.getElementById('student-ws-title');
@@ -360,14 +404,25 @@ function renderStudentWorkspace() {
 
   // Apply typography styles
   applyStudentTypography();
+
+  // Apply mobile panel view if screen <= 768px
+  if (window.innerWidth <= 768) {
+    setMobileViewTab(StudentState.mobileActiveTab || 'read');
+  } else {
+    const readPanel = document.getElementById('student-reading-panel');
+    const quizPanel = document.getElementById('student-practice-panel');
+    if (readPanel) readPanel.style.display = 'block';
+    if (quizPanel) quizPanel.style.display = 'block';
+  }
 }
 
 function renderStudentQNav() {
   const qNav = document.getElementById('student-practice-q-nav');
   if (!qNav) return;
 
+  const masterQ = getMasterQuestions();
   qNav.innerHTML = '';
-  MASTER_QUESTIONS.forEach((q, idx) => {
+  masterQ.forEach((q, idx) => {
     const btn = document.createElement('button');
     btn.className = 'q-pill';
     if (idx === StudentState.currentQuestionIndex) {
@@ -384,6 +439,9 @@ function renderStudentQNav() {
     btn.onclick = () => {
       StudentState.currentQuestionIndex = idx;
       renderStudentWorkspace();
+      if (window.innerWidth <= 768) {
+        setMobileViewTab('quiz');
+      }
     };
     qNav.appendChild(btn);
   });
@@ -393,6 +451,7 @@ function renderStudentPracticeCanvas(q) {
   const canvas = document.getElementById('student-practice-canvas');
   if (!canvas) return;
 
+  const masterQ = getMasterQuestions();
   const currentAnswerObj = StudentState.answers[q.id] || { answer: null, reason: '' };
   const studentAns = currentAnswerObj.answer;
   const studentReason = currentAnswerObj.reason || '';
@@ -400,10 +459,11 @@ function renderStudentPracticeCanvas(q) {
   let interactionHtml = '';
 
   // TYPE 1: MULTIPLE CHOICE (Single)
-  if (q.type === 'mc') {
+  if (q.type === 'mc' || !q.type) {
+    const options = q.options || [];
     interactionHtml = `
       <div class="options-list">
-        ${q.options.map(opt => {
+        ${options.map(opt => {
           const isChecked = studentAns === opt.id;
           return `
             <label class="option-card ${isChecked ? 'selected' : ''}" onclick="selectStudentSingleAnswer(${q.id}, '${opt.id}')">
@@ -417,11 +477,11 @@ function renderStudentPracticeCanvas(q) {
   }
   // TYPE 2: MULTIPLE RESPONSE (Multiple Answers)
   else if (q.type === 'mcma') {
+    const options = q.options || [];
     const selectedArr = Array.isArray(studentAns) ? studentAns : [];
     interactionHtml = `
-
       <div class="options-list">
-        ${q.options.map(opt => {
+        ${options.map(opt => {
           const isChecked = selectedArr.includes(opt.id);
           return `
             <label class="option-card ${isChecked ? 'selected' : ''}" onclick="toggleStudentMultiAnswer(${q.id}, '${opt.id}')">
@@ -440,7 +500,6 @@ function renderStudentPracticeCanvas(q) {
     const matrixAns = Array.isArray(studentAns) ? studentAns : new Array(rows.length).fill(null);
 
     interactionHtml = `
-
       <div style="overflow-x:auto;">
         <table class="interactive-table">
           <thead>
@@ -497,17 +556,17 @@ function renderStudentPracticeCanvas(q) {
     <div class="reasoning-box-wrapper">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <label style="font-size:0.95rem; font-weight:900; color:var(--text-main);">
-          ✍️ Textual Evidence & Critical Reasoning (Bukti Teks & Penalaran Kritis Siswa):
+          ✍️ Textual Evidence & Critical Reasoning:
         </label>
       </div>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
-        Tuliskan bukti paragraf berapa dan kalimat pendukung, serta argumen logis mengapa Anda memilih jawaban di atas.
+        Write paragraph quotes, line references, and logical justification for your chosen answer.
       </p>
       <textarea
         id="student-reason-input-${q.id}"
         class="student-reason-textarea"
-        style="width:100%; min-height:90px; padding:12px 14px; border-radius:10px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); font-family:var(--font-sans); font-size:0.95rem; line-height:1.5; resize:vertical;"
-        placeholder="Contoh: Berdasarkan Paragraf 2 kalimat ke-1 yang menyatakan bahwa... Oleh karena itu opsi ini paling tepat karena..."
+        style="width:100%; min-height:90px; padding:12px 14px; border-radius:10px; border:1.5px solid var(--border-color); background:var(--bg-card); color:var(--text-main); font-family:var(--font-sans); font-size:0.95rem; line-height:1.5; resize:vertical;"
+        placeholder="Type your textual evidence (e.g. Paragraph 2 sentence 1) and logical reasons here..."
         oninput="handleStudentReasonInput(${q.id}, this.value)"
       >${studentReason}</textarea>
     </div>
@@ -523,7 +582,7 @@ function renderStudentPracticeCanvas(q) {
           📋 My Answer Sheet
         </button>
         <button class="btn btn-primary" onclick="nextStudentQuestion()">
-          ${StudentState.currentQuestionIndex === MASTER_QUESTIONS.length - 1 ? 'Check Summary Sheet →' : 'Next Question ►'}
+          ${StudentState.currentQuestionIndex === masterQ.length - 1 ? 'Check Summary Sheet →' : 'Next Question ►'}
         </button>
       </div>
     </div>
@@ -534,7 +593,7 @@ function formatStudentQType(type) {
   if (type === 'mc') return 'Multiple Choice';
   if (type === 'mcma') return 'Multiple Response';
   if (type === 'matrix') return 'Categorization / Matrix';
-  return type.toUpperCase();
+  return 'Multiple Choice';
 }
 
 // Option selection handlers
@@ -568,7 +627,8 @@ function toggleStudentMultiAnswer(qId, optId) {
 }
 
 function setStudentMatrixAnswer(qId, rIdx, val) {
-  const q = MASTER_QUESTIONS.find(item => item.id === qId);
+  const masterQ = getMasterQuestions();
+  const q = masterQ.find(item => item.id === qId);
   const rowCount = q && q.matrixRows ? q.matrixRows.length : 2;
 
   if (!StudentState.answers[qId]) {
@@ -602,7 +662,8 @@ function prevStudentQuestion() {
 }
 
 function nextStudentQuestion() {
-  if (StudentState.currentQuestionIndex < MASTER_QUESTIONS.length - 1) {
+  const masterQ = getMasterQuestions();
+  if (StudentState.currentQuestionIndex < masterQ.length - 1) {
     StudentState.currentQuestionIndex++;
     renderStudentWorkspace();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -619,16 +680,21 @@ function setMobileViewTab(tab) {
   const readPanel = document.getElementById('student-reading-panel');
   const quizPanel = document.getElementById('student-practice-panel');
 
-  if (tab === 'read') {
-    btnRead.classList.add('active');
-    btnQuiz.classList.remove('active');
-    if (readPanel) readPanel.style.display = 'block';
-    if (quizPanel) quizPanel.style.display = 'none';
+  if (window.innerWidth <= 768) {
+    if (tab === 'read') {
+      if (btnRead) btnRead.classList.add('active');
+      if (btnQuiz) btnQuiz.classList.remove('active');
+      if (readPanel) readPanel.style.display = 'block';
+      if (quizPanel) quizPanel.style.display = 'none';
+    } else {
+      if (btnQuiz) btnQuiz.classList.add('active');
+      if (btnRead) btnRead.classList.remove('active');
+      if (quizPanel) quizPanel.style.display = 'block';
+      if (readPanel) readPanel.style.display = 'none';
+    }
   } else {
-    btnQuiz.classList.add('active');
-    btnRead.classList.remove('active');
+    if (readPanel) readPanel.style.display = 'block';
     if (quizPanel) quizPanel.style.display = 'block';
-    if (readPanel) readPanel.style.display = 'none';
   }
 }
 
@@ -672,10 +738,12 @@ function applyStudentTypography() {
 
 // Floating Peek Passage Bottom Sheet
 function openPeekModal() {
-  const currentQ = MASTER_QUESTIONS[StudentState.currentQuestionIndex];
+  const masterQ = getMasterQuestions();
+  const passages = getPassages();
+  const currentQ = masterQ[StudentState.currentQuestionIndex] || masterQ[0];
   if (!currentQ) return;
 
-  const pass = PASSAGES.find(p => p.id === currentQ.textId) || PASSAGES[0];
+  const pass = passages.find(p => p.id === currentQ.textId) || passages[0];
   const title = document.getElementById('peek-sheet-title');
   const body = document.getElementById('peek-sheet-body');
   const overlay = document.getElementById('peek-sheet-overlay');
@@ -704,13 +772,14 @@ function closePeekModal() {
 // ==========================================
 function renderStudentVocabLab() {
   const container = document.getElementById('student-vocab-content-area');
-  if (!container || typeof VOCABULARY === 'undefined') return;
+  if (!container) return;
 
+  const vocabulary = getVocabulary();
   const currentFilter = StudentState.vocabFilter;
   const currentMode = StudentState.vocabActivity;
 
   // Filter Vocabulary List
-  let filteredVocab = [...VOCABULARY];
+  let filteredVocab = [...vocabulary];
   if (currentFilter !== 'all') {
     const targetTextId = `text-${currentFilter}`;
     filteredVocab = filteredVocab.filter(v => v.textId === targetTextId);
@@ -802,7 +871,7 @@ function renderVocabFlipCards(container, list) {
             <div class="flip-card-back">
               <div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                  <span class="vocab-pos-badge" style="background:#dcfce7; color:#166534;">DEFINISI & KONTEKS</span>
+                  <span class="vocab-pos-badge" style="background:#dcfce7; color:#166534;">DEFINITION & CONTEXT</span>
                   <button class="btn-tts-speaker" onclick="event.stopPropagation(); speakStudentWord('${v.word.replace(/'/g, "\\'")}', this);">
                     🔊 Listen
                   </button>
@@ -811,7 +880,7 @@ function renderVocabFlipCards(container, list) {
                   ${v.arti}
                 </div>
                 <div style="font-size:0.88rem; color:var(--text-secondary); background:var(--bg-card); padding:8px 12px; border-radius:8px; margin-bottom:8px; line-height:1.4;">
-                  <strong>Makna Kontekstual:</strong> ${v.contextualMeaning || v.simpleMeaning}
+                  <strong>Contextual Meaning:</strong> ${v.contextualMeaning || v.simpleMeaning}
                 </div>
                 <div style="font-size:0.82rem; color:var(--text-muted); font-style:italic; line-height:1.4;">
                   "${v.sentence || ''}"
@@ -819,7 +888,7 @@ function renderVocabFlipCards(container, list) {
               </div>
 
               <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-muted);">
-                <span>📌 ${v.relatedQuestion || 'Wacana TKA'}</span>
+                <span>📌 ${v.relatedQuestion || 'Text Reference'}</span>
                 <span style="font-weight:700; color:var(--academic-blue);">Tap to Flip Back ↻</span>
               </div>
             </div>
@@ -917,7 +986,6 @@ function handleMatchSelect(col, id) {
     });
   }
 
-  // Check if both selected
   if (state.selectedLeft !== null && state.selectedRight !== null) {
     if (state.selectedLeft === state.selectedRight) {
       state.matchedPairs.push(state.selectedLeft);
@@ -1112,10 +1180,11 @@ function speakStudentWord(word, btnEl) {
 // ==========================================
 function renderStudentStrategy() {
   const container = document.getElementById('student-strategy-cards-container');
-  if (!container || typeof STRATEGIES === 'undefined') return;
+  if (!container) return;
 
+  const strategies = getStrategies();
   container.innerHTML = '';
-  STRATEGIES.forEach(strat => {
+  strategies.forEach(strat => {
     const card = document.createElement('div');
     card.className = 'strategy-card-improved';
     card.innerHTML = `
@@ -1128,7 +1197,7 @@ function renderStudentStrategy() {
         <p class="strategy-card-desc">${strat.shortExplanation}</p>
 
         <div class="strategy-steps-box" style="margin-top:16px;">
-          <div class="strategy-steps-title">📋 Step-by-Step Method (Langkah Eksekusi):</div>
+          <div class="strategy-steps-title">📋 Step-by-Step Method:</div>
           <div style="display:flex; flex-direction:column; gap:6px;">
             ${strat.howToDo.map(step => `<div class="strategy-step-item">• ${step}</div>`).join('')}
           </div>
@@ -1141,7 +1210,7 @@ function renderStudentStrategy() {
 
         <div class="strategy-trap-box" style="margin-top:10px;">
           <div style="font-size:0.85rem; font-weight:900; margin-bottom:4px;">⚠️ Distractor Trap Alert:</div>
-          <div style="font-size:0.85rem; line-height:1.4;">${strat.trapAlert || 'Waspadai pilihan jawaban yang hanya mengulang kata kunci tanpa menjawab inti pertanyaan secara komprehensif.'}</div>
+          <div style="font-size:0.85rem; line-height:1.4;">${strat.trapAlert || 'Beware of choices that repeat keywords without answering the core question.'}</div>
         </div>
       </div>
 
@@ -1159,6 +1228,7 @@ function renderStudentStrategy() {
 }
 
 function goToQuestionFromStrategy(qNum) {
+  const masterQ = getMasterQuestions();
   StudentState.currentQuestionIndex = qNum - 1;
   setStudentView('student_workspace');
 }
@@ -1168,9 +1238,10 @@ function goToQuestionFromStrategy(qNum) {
 // ==========================================
 function renderStudentSummary() {
   const container = document.getElementById('student-summary-container');
-  if (!container || typeof MASTER_QUESTIONS === 'undefined') return;
+  if (!container) return;
 
-  const total = MASTER_QUESTIONS.length;
+  const masterQ = getMasterQuestions();
+  const total = masterQ.length || 30;
   const answered = Object.keys(StudentState.answers).filter(qId => {
     const rec = StudentState.answers[qId];
     return rec && rec.answer !== undefined && rec.answer !== null && rec.answer !== '' && (!Array.isArray(rec.answer) || rec.answer.length > 0);
@@ -1195,7 +1266,7 @@ function renderStudentSummary() {
           <span class="q-badge badge-blue">STUDENT REASONING WORKSHEET</span>
           <h2 style="font-size:1.75rem; font-weight:900; color:var(--text-main); margin-top:6px;">📋 My Complete Answer Sheet</h2>
           <p style="font-size:0.95rem; color:var(--text-muted);">
-            Latihan TKA Bahasa Inggris SMA 2025 Pilihan • Rekapitulasi Bukti Teks & Evaluasi Mandiri Siswa
+            TKA Bahasa Inggris SMA 2025 Pilihan • Textual Evidence & Self-Evaluation Sheet
           </p>
         </div>
         <div style="display:flex; gap:10px;">
@@ -1228,7 +1299,7 @@ function renderStudentSummary() {
             <div style="font-size:1.4rem; font-weight:900; color:#f87171;">${incorrectCount}</div>
           </div>
           <div>
-            <div style="font-size:0.82rem; color:#cbd5e1; font-weight:800;">⏳ Pending Evaluation</div>
+            <div style="font-size:0.82rem; color:#cbd5e1; font-weight:800;">⏳ Pending</div>
             <div style="font-size:1.4rem; font-weight:900; color:#cbd5e1;">${total - evaluatedCount}</div>
           </div>
         </div>
@@ -1242,20 +1313,20 @@ function renderStudentSummary() {
       </h3>
 
       <div style="display:flex; flex-direction:column; gap:18px;">
-        ${MASTER_QUESTIONS.map(q => {
+        ${masterQ.map(q => {
           const ansRec = StudentState.answers[q.id] || { answer: null, reason: '' };
           const hasAns = ansRec.answer !== undefined && ansRec.answer !== null && ansRec.answer !== '' && (!Array.isArray(ansRec.answer) || ansRec.answer.length > 0);
           
-          let displayAns = '<span style="color:var(--text-muted); font-style:italic;">[Belum Dijawab]</span>';
+          let displayAns = '<span style="color:var(--text-muted); font-style:italic;">[Not Answered Yet]</span>';
           if (hasAns) {
-            if (q.type === 'mc') {
+            if (q.type === 'mc' || !q.type) {
               displayAns = `<span class="badge badge-blue" style="font-size:0.92rem; font-weight:800;">Option: ${ansRec.answer}</span>`;
             } else if (q.type === 'mcma') {
               displayAns = `<span class="badge badge-blue" style="font-size:0.92rem; font-weight:800;">Options: ${Array.isArray(ansRec.answer) ? ansRec.answer.join(', ') : ansRec.answer}</span>`;
             } else if (q.type === 'matrix') {
               const rows = q.matrixRows || [];
               const arr = Array.isArray(ansRec.answer) ? ansRec.answer : [];
-              displayAns = rows.map((r, i) => `<div><small><strong>${i + 1}.</strong> ${arr[i] ? arr[i] : '<em>(Belum dipilih)</em>'}</small></div>`).join('');
+              displayAns = rows.map((r, i) => `<div><small><strong>${i + 1}.</strong> ${arr[i] ? arr[i] : '<em>(Not selected)</em>'}</small></div>`).join('');
             }
           }
 
@@ -1267,7 +1338,7 @@ function renderStudentSummary() {
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                 <div>
                   <span class="q-badge badge-blue">QUESTION 0${q.id < 10 ? '0' + q.id : q.id}</span>
-                  <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-left:8px;">${q.textId.toUpperCase()} • ${formatStudentQType(q.type)}</span>
+                  <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-left:8px;">${(q.textId || '').toUpperCase()} • ${formatStudentQType(q.type)}</span>
                 </div>
                 
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -1297,7 +1368,7 @@ function renderStudentSummary() {
                 <div style="background:var(--bg-card); padding:12px 16px; border-radius:10px; border:1px solid var(--border-color);">
                   <div style="font-size:0.82rem; font-weight:800; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase;">Textual Evidence & Reasoning:</div>
                   <div style="font-size:0.92rem; color:var(--text-secondary); line-height:1.45;">
-                    ${hasReason ? ansRec.reason : '<em style="color:var(--text-muted);">Tidak ada bukti teks atau penalaran yang dicatat.</em>'}
+                    ${hasReason ? ansRec.reason : '<em style="color:var(--text-muted);">No textual evidence or reasoning recorded.</em>'}
                   </div>
                 </div>
               </div>
@@ -1321,7 +1392,8 @@ function setQuestionEvaluation(qId, status) {
 }
 
 function goToQuestionFromSummary(qId) {
-  const targetIndex = MASTER_QUESTIONS.findIndex(q => q.id === qId);
+  const masterQ = getMasterQuestions();
+  const targetIndex = masterQ.findIndex(q => q.id === qId);
   if (targetIndex !== -1) {
     StudentState.currentQuestionIndex = targetIndex;
     setStudentView('student_workspace');
