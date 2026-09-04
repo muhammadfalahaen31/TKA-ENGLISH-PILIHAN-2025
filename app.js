@@ -13,8 +13,13 @@ let gameStreak = 0;
 let gameMaxStreak = 0;
 let gameAnswered = false;
 
-// INITIALIZATION
-document.addEventListener("DOMContentLoaded", () => {
+if (document.readyState === 'loading') {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
+
+function initApp() {
   initTabs();
   renderStrategies();
   renderQuestion(currentQuestionIndex);
@@ -22,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderVocabulary();
   initVocabFilters();
   initGameWorkspace();
-});
+}
 
 // TAB SYSTEM
 function initTabs() {

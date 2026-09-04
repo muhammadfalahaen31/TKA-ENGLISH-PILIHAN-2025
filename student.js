@@ -80,12 +80,16 @@ const StudentState = {
   vocabSearchQuery: ''
 };
 
+
 // ==========================================
-// INITIALIZATION
+// ROBUST INITIALIZATION (PREVENT RACE CONDITION)
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initStudentApp);
+} else {
   initStudentApp();
-});
+}
+
 
 function initStudentApp() {
   loadStudentTheme();
@@ -123,7 +127,13 @@ function applyStudentTheme(theme) {
 
 function loadStudentData() {
   try {
-    const raw = SafeStorage.getItem(STUDENT_STORAGE_KEY);
+    let raw = SafeStorage.getItem(STUDENT_STORAGE_KEY);
+    if (!raw) {
+      raw = SafeStorage.getItem('tka_english_2025_pilihan_student');
+    }
+    if (!raw) {
+      raw = SafeStorage.getItem('tka_english_2025_pilihan_student_v2');
+    }
     if (raw) {
       const data = JSON.parse(raw);
       if (data.profile) StudentState.profile = { ...StudentState.profile, ...data.profile };
