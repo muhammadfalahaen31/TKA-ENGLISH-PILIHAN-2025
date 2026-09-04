@@ -5,11 +5,11 @@ const PASSAGES = [
     id: "text-1",
     number: 1,
     title: "Balancing Our Online and Offline Selves",
-    text: `In today’s world, the line between our online and offline lives is becoming less clear. Many people create ideal versions of themselves on social media, which often do not fully match who they really are. This difference is called "digital dissonance"—the gap between how we present ourselves online and who we truly are in real life. This can affect our mental health and the quality of our relationships.
+    text: `In today's world, the line between our online and offline lives is becoming less clear. Many people create ideal versions of themselves on social media, which often do not fully match who they really are. This difference is called "digital dissonance"-the gap between how we present ourselves online and who we truly are in real life. This can affect our mental health and the quality of our relationships.
 
-First, the pressure to keep a perfect online image can cause stress, anxiety, and low self-esteem. When we compare ourselves to the happy and successful posts of others, we may feel like we are not good enough. It is important to remember that what we see online is only a small part of someone’s life, not the whole story. Reminding ourselves of this can reduce the harmful effects of unrealistic comparisons and improve our self-worth.
+First, the pressure to keep a perfect online image can cause stress, anxiety, and low self-esteem. When we compare ourselves to the happy and successful posts of others, we may feel like we are not good enough. It is important to remember that what we see online is only a small part of someone's life, not the whole story. Reminding ourselves of this can reduce the harmful effects of unrealistic comparisons and improve our self-worth.
 
-Second, carefully crafted online personas can reduce honesty in real-life interactions. People might act differently online to gain approval or likes. This can harm genuine communication and relationships. Over time, this may create distance between friends or family members who feel they no longer know the “real” person behind the screen.
+Second, carefully crafted online personas can reduce honesty in real-life interactions. People might act differently online to gain approval or likes. This can harm genuine communication and relationships. Over time, this may create distance between friends or family members who feel they no longer know the "real" person behind the screen.
 
 To address this, we need to be mindful and responsible when using digital platforms. Being mindful means paying attention to whether our online behavior reflects our true values. It means thinking carefully before posting, being honest about our experiences, and understanding that social media is not the only way to measure success. Practicing digital mindfulness can help us use technology in a healthier, more balanced way.
 
@@ -24,7 +24,7 @@ By staying true to ourselves both online and offline, we can enjoy the benefits 
 
 The findings from a study highlight the significant impact of BNPL on impulsive buying behavior among e-commerce users in Indonesia. The increasing integration of pay later options within e-commerce platforms offers a convenient solution for users to defer payments. This convenience, while beneficial for those in need of flexible financial solutions, inadvertently encourages users to make more impulsive purchases, driven by the perceived ease and lack of immediate financial commitment.
 
-One notable aspect observed in the study is the correlation between gender and shopping frequency, with women showing a higher tendency for frequent shopping compared to men. Women, for example, tend to be more responsive to promotions and discounts, especially in ecommerce, where targeted advertisements are tailored to attract shoppers with offers that appeal to their preferences. Additionally, the convenience of shopping from home and the availability of various options for household, personal care, and family needs align more closely with women’s purchasing behavior patterns.
+One notable aspect observed in the study is the correlation between gender and shopping frequency, with women showing a higher tendency for frequent shopping compared to men. Women, for example, tend to be more responsive to promotions and discounts, especially in ecommerce, where targeted advertisements are tailored to attract shoppers with offers that appeal to their preferences. Additionally, the convenience of shopping from home and the availability of various options for household, personal care, and family needs align more closely with women's purchasing behavior patterns.
 
 Technological advancements in online transactions have made shopping easier and more accessible than ever before. Features like BNPL not only add flexibility but also make the purchasing process more seamless.
 
@@ -41,18 +41,18 @@ On the one hand, the advantages of electric vehicles are clear. EVs produce zero
 
 On the other hand, there are still several drawbacks to consider. One major concern is the limited availability of charging stations, especially in rural or remote areas, which makes long-distance travel more difficult. Charging times can also be inconvenient compared to the quick refueling of conventional cars. Another issue is the environmental cost of battery production. Mining for lithium and other rare materials used in EV batteries can harm ecosystems and involve high energy use. Moreover, disposing of used batteries poses a long-term environmental risk unless proper recycling methods are widely adopted.
 
-In conclusion, while electric vehicles offer a promising solution to some of the world’s most pressing environmental problems, their future success depends on addressing current limitations. Investment in charging infrastructure, sustainable battery production, and public awareness will be essential to ensure that EVs are not only clean but also practical and accessible for everyone. The future of transportation may well be electric, but it will require careful planning and cooperation among governments, industries, and individuals to realize its full potential.`,
+In conclusion, while electric vehicles offer a promising solution to some of the world's most pressing environmental problems, their future success depends on addressing current limitations. Investment in charging infrastructure, sustainable battery production, and public awareness will be essential to ensure that EVs are not only clean but also practical and accessible for everyone. The future of transportation may well be electric, but it will require careful planning and cooperation among governments, industries, and individuals to realize its full potential.`,
     source: "Adapted from:\nSME News Service. (2025, July 12). Electric vehicles: The road ahead - Benefits, drawbacks & what the future holds. Sustainability ME News.\nThe Lifeology Editorial Team. (2024, July 3). Advantages and disadvantages of electric vehicles: A comprehensive analysis. Lifeology.\nAlanazi, F. (2023). Electric vehicles: benefits, challenges, and potential solutions for widespread adaptation. Applied sciences, 13(10), 6016."
   },
   {
     id: "text-4",
     number: 4,
     title: "The Rise of Finfluencers",
-    text: `In today’s rapidly evolving digital age, understanding personal finance has become essential—yet many still find investing, budgeting, and growing wealth difficult to grasp. That’s where financial influencers, or “finfluencers,” play a crucial role. These individuals simplify complex financial topics, making them accessible to a broader audience and empowering people to make informed financial choices.
+    text: `In today's rapidly evolving digital age, understanding personal finance has become essential-yet many still find investing, budgeting, and growing wealth difficult to grasp. That's where financial influencers, or "finfluencers," play a crucial role. These individuals simplify complex financial topics, making them accessible to a broader audience and empowering people to make informed financial choices.
 
 Finfluencers share useful advice on managing money, from saving and investing to tackling debt. Unlike conservative advisors, they utilize social media and create short videos as tools to educate followers. A study in 2023 found that 76% of people learn faster through visual and short form content vs. traditional articles. Therefore, whether you're just starting to study the stock market or trying to structure monthly budget, finfluencers provide real, practical, and easy-to-understand insights.
 
-One of the major advantages of following finfluencers is their openness. Many share their personal experiences, including financial wins and setbacks, which builds authenticity and trust. A survey in 2024 reveals that 78% of consumers trust ‘people like themselves’ or relatable experts over corporations. This shows their authenticity will drive positive result. Furthermore, they also stay current with economic trends, cryptocurrency updates, and passive income ideas, which help their audiences stay ahead in a shifting financial landscape.
+One of the major advantages of following finfluencers is their openness. Many share their personal experiences, including financial wins and setbacks, which builds authenticity and trust. A survey in 2024 reveals that 78% of consumers trust 'people like themselves' or relatable experts over corporations. This shows their authenticity will drive positive result. Furthermore, they also stay current with economic trends, cryptocurrency updates, and passive income ideas, which help their audiences stay ahead in a shifting financial landscape.
 
 Additionally, finfluencers serve as motivation by sharing relatable success stories and encouraging habits like saving for early retirement or building financial independence. Some even help protect their followers by debunking financial myths and warning against high-risk ventures like meme stocks and speculative crypto schemes. With the right guidance, you can become more financially empowered. There's no need to navigate your financial journey alone when credible, expert advice is just a scroll away. Start learning from finfluencers today and begin shaping a more secure financial future.`,
     source: "Adapted from:\n1. https://artafinance.com/insights/gen-z-in-crisis-money-mental-health-and-the-fight-for-stability\n2. https://www.wesleyan.co.uk/the-next-step/blog/detail/financial-influencers\n3. https://dfpi.ca.gov/news/insights/social-media-finfluencers-who-should-you-trust/\n4. https://www.simplyacademy.com/news-post/the-impact-of-finfluencers-on-the-financial-advice-sector/\n5. https://www.youtube.com/watch?v=ILsXSJeF9Xc&ab_channel=ThePlainBagel"
@@ -65,7 +65,7 @@ Additionally, finfluencers serve as motivation by sharing relatable success stor
 
 One major advantage of vertical farming is its efficient use of space. Since crops are grown vertically rather than horizontally, this system is ideal for cities where land is limited. It allows fresh produce to be grown close to consumers, reducing transportation costs and carbon emissions. Additionally, vertical farms can operate year-round, independent of seasonal changes, ensuring a steady supply of food.
 
-Another benefit is the reduced environmental impact compared to traditional farming. Vertical gardens use up to 90% less water because they recycle water within the system. They also eliminate the need for chemical pesticides and herbicides, resulting in cleaner water systems and healthier ecosystems. Moreover, since crops don’t require soil, there is no risk of soil degradation or erosion.
+Another benefit is the reduced environmental impact compared to traditional farming. Vertical gardens use up to 90% less water because they recycle water within the system. They also eliminate the need for chemical pesticides and herbicides, resulting in cleaner water systems and healthier ecosystems. Moreover, since crops don't require soil, there is no risk of soil degradation or erosion.
 
 However, there are also notable disadvantages to vertical farming. One of the biggest concerns is the high initial cost of setting up a vertical farm. These systems require advanced technology, LED lighting, climate control, and automation, which can be expensive to install and maintain. In addition, vertical farming uses a significant amount of electricity, especially for lighting, which may offset some of its environmental benefits if the energy is not sourced from renewable resources.
 
@@ -78,11 +78,11 @@ Despite these challenges, vertical farming remains a promising option for sustai
     title: "Fast Fashion: Convenience at a Cost",
     text: `Fast fashion refers to the production of inexpensive clothing in response to rapidly changing trends. It allows people to buy stylish clothes quickly and at low prices. In many cities, young people enjoy following online trends and changing their outfits often. But this lifestyle choice comes with serious consequences, especially for the environment.
 
-Supporters of fast fashion argue that it makes clothing more accessible. In the past, many people could only afford new clothes a few times a year. Now, with lower prices and faster delivery, fashion feels more democratic. Some businesses are even trying to reduce waste by reusing materials or selling secondhand clothing. These small steps are part of what is called a “circular economy,” where products are reused or recycled instead of thrown away. If supported by technology and better systems, this approach could help reduce the negative impact of fast fashion.
+Supporters of fast fashion argue that it makes clothing more accessible. In the past, many people could only afford new clothes a few times a year. Now, with lower prices and faster delivery, fashion feels more democratic. Some businesses are even trying to reduce waste by reusing materials or selling secondhand clothing. These small steps are part of what is called a "circular economy," where products are reused or recycled instead of thrown away. If supported by technology and better systems, this approach could help reduce the negative impact of fast fashion.
 
-However, the problems linked to fast fashion are still severe. The fashion industry is responsible for around 8–10% of global carbon emissions and about 20% of industrial water pollution. Producing just one cotton shirt uses up enough water to supply a person with drinking water for two years. Many fast fashion items are made from materials that are not biodegradable, meaning they stay in landfills for hundreds of years. Because these clothes are often low in quality, people wear them only a few times before discarding them. In some countries, clothing consumption has grown by over 50% in the last decade, while the average use of each item has fallen sharply.
+However, the problems linked to fast fashion are still severe. The fashion industry is responsible for around 8-10% of global carbon emissions and about 20% of industrial water pollution. Producing just one cotton shirt uses up enough water to supply a person with drinking water for two years. Many fast fashion items are made from materials that are not biodegradable, meaning they stay in landfills for hundreds of years. Because these clothes are often low in quality, people wear them only a few times before discarding them. In some countries, clothing consumption has grown by over 50% in the last decade, while the average use of each item has fallen sharply.
 
-Finding a balance between style and responsibility is not easy. Recycling clothes remains a challenge, and not all donated clothes are reused. Still, changes are possible. Some governments are starting to create rules that make companies more responsible for waste. Education also plays an important role. If more people understand the impact of their shopping habits, they may begin to choose better quality items and buy fewer things. In the end, fashion can still be fun—but it must also be fair and sustainable.`,
+Finding a balance between style and responsibility is not easy. Recycling clothes remains a challenge, and not all donated clothes are reused. Still, changes are possible. Some governments are starting to create rules that make companies more responsible for waste. Education also plays an important role. If more people understand the impact of their shopping habits, they may begin to choose better quality items and buy fewer things. In the end, fashion can still be fun-but it must also be fair and sustainable.`,
     source: "Source: Long, X. (2025). How does fast fashion affect the environment? Economics Observatory. https://www.economicsobservatory.com/how-does-fast-fashion-affect-the-environment"
   }
 ];
@@ -401,7 +401,7 @@ const QUESTIONS = [
     matrixHeaders: ["Statements", "Agree", "Disagree"],
     matrixRows: [
       { text: "The arguments presented in the text are not only logical but also persuasive as they are supported by data from a study.", answer: "Agree" },
-      { text: "The text presents reasonable arguments and may possibly convince readers aged 18"“21 to use BNPL.", answer: "Disagree" },
+      { text: "The text presents reasonable arguments and may possibly convince readers aged 18-21 to use BNPL.", answer: "Disagree" },
       { text: "The text has strong points about BNPL because the data are based on research.", answer: "Agree" }
     ],
     correctAnswer: ["Agree", "Disagree", "Agree"],
@@ -853,7 +853,7 @@ const QUESTIONS_21_30 = [
     ],
     correctAnswer: "C",
     explanation: "Paragraf 3 secara eksplisit menyebutkan dampak lingkungan industri fast fashion, yaitu menyumbang sekitar 20% dari seluruh pencemaran air industri global.",
-    evidence: "The fashion industry is responsible for around 8"“10% of global carbon emissions and about 20% of industrial water pollution.",
+    evidence: "The fashion industry is responsible for around 8-10% of global carbon emissions and about 20% of industrial water pollution.",
     reasoning: "Soal memfilter dampak khusus terhadap LINGKUNGAN (environmental impact). Opsi C adalah dampak lingkungan nyata yang tercantum di Paragraf 3.",
     optionAnalysis: [
       { id: "A", status: "incorrect", text: "Salah. Keterjangkauan harga baju adalah aspek ekonomi/aksesibilitas, bukan dampak kerusakan lingkungan." },
@@ -880,7 +880,7 @@ const QUESTIONS_21_30 = [
     ],
     correctAnswer: ["A", "B", "C", "E"],
     explanation: "Pernyataan A, B, C, dan E merupakan fakta eksplisit Paragraf 1, 2, dan 3. Pernyataan D salah karena bahan yang digunakan fast fashion justru TIDAK dapat terurai secara alami (NOT biodegradable).",
-    evidence: "...responsible for around 8"“10% of global carbon emissions... products are reused or recycled... wear them only a few times before discarding... NOT biodegradable...",
+    evidence: "...responsible for around 8-10% of global carbon emissions... products are reused or recycled... wear them only a few times before discarding... NOT biodegradable...",
     reasoning: "Waspadai kata jebakan pada opsi D: Teks menyatakan bahan pakaian 'are NOT biodegradable', sehingga opsi D bernilai salah.",
     optionAnalysis: [
       { id: "A", status: "correct", text: "Benar. Teks Paragraf 3 secara eksplisit mencantumkan emisi karbon 8-10%." },
@@ -988,7 +988,7 @@ const VOCABULARY = [
     "arti": "Ketidaksesuaian atau konflik batin akibat perbedaan identitas digital dengan realitas.",
     "contextualMeaning": "Kesenjangan antara gambaran diri ideal yang ditampilkan di media sosial dan kenyataan diri yang sebenarnya.",
     "simpleMeaning": "Kondisi ketika apa yang kamu tampilkan di medsos beda jauh dengan kehidupan nyatamu.",
-    "sentence": "This difference is called \"digital dissonance\"—the gap between how we present ourselves online and who we truly are in real life.",
+    "sentence": "This difference is called 'digital dissonance'-the gap between how we present ourselves online and who we truly are in real life.",
     "relatedQuestion": "Question 04",
     "whyItMatters": "Membantu siswa mengidentifikasi akar masalah psikologis utama yang dibahas pada Teks 1."
   },
@@ -1128,7 +1128,7 @@ const VOCABULARY = [
     "arti": "Karakter buatan yang diproyeksikan di balik layar.",
     "contextualMeaning": "Kepribadian artifisial yang terpisah dari identitas nyata seseorang dalam kehidupan sehari-hari.",
     "simpleMeaning": "Topeng kepribadian yang sengaja dibuat hanya saat tampil di layar gadget.",
-    "sentence": "...who feel they no longer know the “real” person behind the screen.",
+    "sentence": "...who feel they no longer know the 'real' person behind the screen.",
     "relatedQuestion": "Question 10",
     "whyItMatters": "Menjelaskan jarak emosional yang muncul antara keluarga/teman dengan individu."
   },
@@ -1251,7 +1251,7 @@ const VOCABULARY = [
     "word": "late adolescents",
     "pos": "Noun Phrase",
     "phonetic": "/leɪt ˌæd.əˈles.ənts/",
-    "arti": "Kelompok usia remaja akhir (usia 18–21 tahun).",
+    "arti": "Kelompok usia remaja akhir (usia 18-21 tahun).",
     "contextualMeaning": "Target demografi yang emosinya masih berkembang sehingga paling rentan terhadap fitur paylater.",
     "simpleMeaning": "Anak muda usia transisi SMA/kuliah (18-21 tahun) yang baru mulai pegang uang sendiri.",
     "sentence": "This phenomenon is notably prevalent among individuals aged 18 to 21 years, as late adolescents are still influenced by various psychological factors.",
@@ -1618,7 +1618,7 @@ const VOCABULARY = [
     "arti": "Financial Influencers (kreator konten edukasi keuangan di media sosial).",
     "contextualMeaning": "Individu di media sosial yang mengemas topik investasi dan pengelolaan uang agar mudah dipahami publik.",
     "simpleMeaning": "Selebgram atau konten kreator yang suka bikin video tips mengelola uang dan investasi.",
-    "sentence": "That’s where financial influencers, or “finfluencers,” play a crucial role.",
+    "sentence": "That's where financial influencers, or 'finfluencers,' play a crucial role.",
     "relatedQuestion": "Question 16",
     "whyItMatters": "Topik utama dan figur sentral yang dibahas dalam wacana Teks 4."
   },
@@ -1632,7 +1632,7 @@ const VOCABULARY = [
     "arti": "Literasi atau kemahiran mengelola keuangan pribadi.",
     "contextualMeaning": "Pengetahuan praktis tentang menabung, investasi, dan budgeting untuk mencapai kemapanan ekonomi.",
     "simpleMeaning": "Pintar dan melek cara mengatur uang, menabung, dan menghindari utang jahat.",
-    "sentence": "...understanding personal finance has become essential—yet many still find investing, budgeting, and growing wealth difficult to grasp.",
+    "sentence": "...understanding personal finance has become essential-yet many still find investing, budgeting, and growing wealth difficult to grasp.",
     "relatedQuestion": "Question 16",
     "whyItMatters": "Tujuan utama gerakan edukasi yang disuarakan oleh para finfluencer."
   },
@@ -1940,7 +1940,7 @@ const VOCABULARY = [
     "arti": "Degradasi atau penurunan kualitas kesuburan tanah.",
     "contextualMeaning": "Kerusakan lapisan tanah humus akibat erosi dan pemakaian pupuk kimiawi berlebih di pertanian konvensional.",
     "simpleMeaning": "Kondisi tanah yang rusak, gersang, dan hilang kesuburannya.",
-    "sentence": "Moreover, since crops don’t require soil, there is no risk of soil degradation or erosion.",
+    "sentence": "Moreover, since crops don't require soil, there is no risk of soil degradation or erosion.",
     "relatedQuestion": "Question 22",
     "whyItMatters": "Poin perbandingan keunggulan metode nir-tanah (soilless agriculture)."
   },
@@ -2066,7 +2066,7 @@ const VOCABULARY = [
     "arti": "Ekonomi sirkular (daur ulang dan guna ulang tanpa limbah).",
     "contextualMeaning": "Sistem industri berkelanjutan di mana serat pakaian lama dipintal kembali menjadi benang baru.",
     "simpleMeaning": "Sistem ramah lingkungan di mana baju bekas didaur ulang lagi agar tidak jadi sampah menumpuk.",
-    "sentence": "These small steps are part of what is called a “circular economy,” where products are reused or recycled instead of thrown away.",
+    "sentence": "These small steps are part of what is called a 'circular economy,' where products are reused or recycled instead of thrown away.",
     "relatedQuestion": "Question 27",
     "whyItMatters": "Konsep solusi inovatif yang diuji pemahamannya pada Question 27."
   },
@@ -2122,7 +2122,7 @@ const VOCABULARY = [
     "arti": "Jejak karbon emisi industri garmen global.",
     "contextualMeaning": "Kontribusi 8-10% dari total emisi karbon dunia yang dihasilkan oleh pabrik pemintalan dan pengiriman baju.",
     "simpleMeaning": "Total gas polusi yang dihasilkan oleh pabrik pembuatan baju dan kapal pengirimannya.",
-    "sentence": "The fashion industry is responsible for around 8–10% of global carbon emissions...",
+    "sentence": "The fashion industry is responsible for around 8-10% of global carbon emissions...",
     "relatedQuestion": "Question 30",
     "whyItMatters": "Bukti statistik kuantitatif tentang besarnya kontribusi industri garmen terhadap pemanasan global."
   },
@@ -2192,7 +2192,7 @@ const VOCABULARY = [
     "arti": "Mode berkelanjutan yang ramah lingkungan dan etis.",
     "contextualMeaning": "Gerakan industri garmen yang mengutamakan bahan organik, keadilan upah buruh, dan ketahanan pakai pakaian.",
     "simpleMeaning": "Tren baju ramah lingkungan yang bahannya awet dan proses pembuatannya tidak merusak alam.",
-    "sentence": "In the end, fashion can still be fun—but it must also be fair and sustainable.",
+    "sentence": "In the end, fashion can still be fun-but it must also be fair and sustainable.",
     "relatedQuestion": "Question 26",
     "whyItMatters": "Pesan moral dan kesimpulan utama penulis di paragraf penutup Teks 6."
   },
