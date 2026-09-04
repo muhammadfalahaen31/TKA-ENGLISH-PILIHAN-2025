@@ -1,10 +1,10 @@
 // ==========================================================================
 // LATIHAN TKA BAHASA INGGRIS SMA 2025 PILIHAN
 // STUDENT MODE JAVASCRIPT ENGINE (student.js)
-// 100% Offline, Touch-Safe, Mobile-First, SafeStorage Enabled
+// 100% Offline, Touch-Safe, Mobile-First, SafeStorage & Self-Correction Enabled
 // ==========================================================================
 
-const STUDENT_STORAGE_KEY = 'tka_english_2025_pilihan_student';
+const STUDENT_STORAGE_KEY = 'tka_english_2025_pilihan_student_v2';
 const THEME_KEY = 'tka_english_2025_theme';
 
 // SafeStorage Wrapper with in-memory fallback for file:// and sandboxes
@@ -68,8 +68,8 @@ const StudentState = {
   mobileActiveTab: 'read', // 'read' or 'quiz'
 
   // Typography
-  fontSizeLevel: 0,
-  fontFamily: 'serif',
+  fontSizeLevel: 0, // -1 (sm), 0 (normal), 1 (md), 2 (lg)
+  fontFamily: 'serif', // 'serif' or 'sans'
   theme: 'light',
 
   // Vocab Lab state
@@ -129,6 +129,8 @@ function loadStudentData() {
       if (data.profile) StudentState.profile = { ...StudentState.profile, ...data.profile };
       if (data.answers) StudentState.answers = data.answers;
       if (data.evaluations) StudentState.evaluations = data.evaluations;
+      if (typeof data.fontSizeLevel === 'number') StudentState.fontSizeLevel = data.fontSizeLevel;
+      if (data.fontFamily) StudentState.fontFamily = data.fontFamily;
     }
   } catch (e) {
     console.warn('Error loading student data from SafeStorage:', e);
@@ -152,6 +154,8 @@ function saveStudentData() {
       profile: StudentState.profile,
       answers: StudentState.answers,
       evaluations: StudentState.evaluations,
+      fontSizeLevel: StudentState.fontSizeLevel,
+      fontFamily: StudentState.fontFamily,
       updatedAt: Date.now()
     };
     SafeStorage.setItem(STUDENT_STORAGE_KEY, JSON.stringify(dataToSave));
@@ -172,14 +176,11 @@ function saveStudentProfile() {
   if (teacherInput) StudentState.profile.teacher = teacherInput.value.trim();
 
   saveStudentData();
-  showStudentToast('✅ Profile saved successfully!');
+  showStudentToast('✅ Student Profile Saved!');
 }
 
 function setupStudentEvents() {
-  // Mobile responsive resize listener if needed
-  window.addEventListener('resize', () => {
-    // Keep mobile state consistent
-  });
+  // Global shortcut or resize handlers if needed
 }
 
 // ==========================================
@@ -296,7 +297,6 @@ function renderStudentDashboard() {
 
 function openStudentWorkspace(textNumber) {
   StudentState.selectedTextId = textNumber;
-  // find first question index for this text
   const targetTextId = `text-${textNumber}`;
   const firstQIndex = MASTER_QUESTIONS.findIndex(q => q.textId === targetTextId);
   if (firstQIndex !== -1) {
@@ -312,7 +312,6 @@ function renderStudentWorkspace() {
   const currentQ = MASTER_QUESTIONS[StudentState.currentQuestionIndex];
   if (!currentQ) return;
 
-  // Sync selectedTextId with currentQ.textId
   const matchNum = currentQ.textId.match(/\d+/);
   if (matchNum) {
     StudentState.selectedTextId = parseInt(matchNum[0], 10);
@@ -337,8 +336,8 @@ function renderStudentWorkspace() {
     const paragraphs = currentPassage.text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     rContent.innerHTML = paragraphs.map((p, idx) => `
       <div class="reading-paragraph">
-        <span class="p-num">${idx + 1}</span>
-        <p class="reading-text">${p.trim()}</p>
+        <span class="p-number">${idx + 1}</span>
+        <span class="reading-text">${p.trim()}</span>
       </div>
     `).join('');
   }
@@ -371,7 +370,7 @@ function renderStudentQNav() {
       btn.classList.add('answered');
     }
 
-    btn.textContent = q.number < 10 ? `0${q.number}` : `${q.number}`;
+    btn.textContent = q.id < 10 ? `0${q.id}` : `${q.id}`;
     btn.onclick = () => {
       StudentState.currentQuestionIndex = idx;
       renderStudentWorkspace();
@@ -390,74 +389,80 @@ function renderStudentPracticeCanvas(q) {
 
   let interactionHtml = '';
 
-  if (q.questionType === 'multiple-choice') {
+  // TYPE 1: MULTIPLE CHOICE (Single)
+  if (q.type === 'mc') {
     interactionHtml = `
-      <div class="options-container">
+      <div class="options-list">
         ${q.options.map(opt => {
           const isChecked = studentAns === opt.id;
           return `
-            <label class="option-card ${isChecked ? 'selected' : ''}" onclick="selectStudentSingleAnswer('${q.id}', '${opt.id}')">
-              <input type="radio" name="student_opt_${q.id}" value="${opt.id}" ${isChecked ? 'checked' : ''} style="display:none;">
-              <span class="option-pill">${opt.id}</span>
-              <span class="option-text">${opt.text}</span>
+            <label class="option-card ${isChecked ? 'selected' : ''}" onclick="selectStudentSingleAnswer(${q.id}, '${opt.id}')">
+              <span class="opt-radio-circle">${isChecked ? '✓' : opt.id}</span>
+              <span class="opt-text"><strong>${opt.id}.</strong> ${opt.text}</span>
             </label>
           `;
         }).join('')}
       </div>
     `;
-  } else if (q.questionType === 'multiple-choice-multiple-answers') {
+  }
+  // TYPE 2: MULTIPLE RESPONSE (Multiple Answers)
+  else if (q.type === 'mcma') {
     const selectedArr = Array.isArray(studentAns) ? studentAns : [];
     interactionHtml = `
-      <div style="margin-bottom:12px; font-size:0.88rem; color:var(--academic-blue); font-weight:700;">
-        💡 Petunjuk: Anda dapat memilih lebih dari satu opsi yang tepat (Multiple Selection).
+      <div style="margin-bottom:12px; font-size:0.9rem; color:var(--academic-blue); font-weight:800;">
+        💡 Petunjuk: Anda dapat memilih lebih dari satu jawaban yang benar (Pilihan Ganda Kompleks).
       </div>
-      <div class="options-container">
+      <div class="options-list">
         ${q.options.map(opt => {
           const isChecked = selectedArr.includes(opt.id);
           return `
-            <label class="option-card ${isChecked ? 'selected' : ''}" onclick="toggleStudentMultiAnswer('${q.id}', '${opt.id}')">
-              <input type="checkbox" name="student_opt_${q.id}" value="${opt.id}" ${isChecked ? 'checked' : ''} style="display:none;">
-              <span class="option-pill">${opt.id}</span>
-              <span class="option-text">${opt.text}</span>
+            <label class="option-card ${isChecked ? 'selected' : ''}" onclick="toggleStudentMultiAnswer(${q.id}, '${opt.id}')">
+              <span class="opt-checkbox-box">${isChecked ? '✓' : ''}</span>
+              <span class="opt-text"><strong>${opt.id}.</strong> ${opt.text}</span>
             </label>
           `;
         }).join('')}
       </div>
     `;
-  } else if (q.questionType === 'matrix-grid' || q.matrixStatements) {
-    const statements = q.matrixStatements || [];
-    const matrixAns = (typeof studentAns === 'object' && studentAns !== null && !Array.isArray(studentAns)) ? studentAns : {};
-    
+  }
+  // TYPE 3: MATRIX / CATEGORIZATION GRID
+  else if (q.type === 'matrix') {
+    const headers = q.matrixHeaders || ['Statement', 'True', 'False'];
+    const rows = q.matrixRows || [];
+    const matrixAns = Array.isArray(studentAns) ? studentAns : new Array(rows.length).fill(null);
+
     interactionHtml = `
-      <div style="margin-bottom:12px; font-size:0.88rem; color:var(--academic-blue); font-weight:700;">
-        💡 Petunjuk: Tentukan status kebenaran (True / False / Not Mentioned) untuk setiap pernyataan berikut:
+      <div style="margin-bottom:12px; font-size:0.9rem; color:var(--academic-blue); font-weight:800;">
+        💡 Petunjuk: Tentukan kategori yang tepat untuk setiap pernyataan berikut:
       </div>
-      <div class="matrix-grid-table-wrap">
-        <table class="matrix-table" style="width:100%; border-collapse:collapse; margin-bottom:16px;">
+      <div style="overflow-x:auto;">
+        <table class="interactive-table">
           <thead>
-            <tr style="background:var(--bg-card-alt); border-bottom:2px solid var(--border-color);">
-              <th style="padding:10px 12px; text-align:left; font-size:0.85rem; color:var(--text-muted);">Pernyataan / Statement</th>
-              <th style="padding:10px 12px; text-align:center; font-size:0.85rem; width:80px; color:var(--text-muted);">True</th>
-              <th style="padding:10px 12px; text-align:center; font-size:0.85rem; width:80px; color:var(--text-muted);">False</th>
-              <th style="padding:10px 12px; text-align:center; font-size:0.85rem; width:110px; color:var(--text-muted);">Not Mentioned</th>
+            <tr>
+              <th>${headers[0]}</th>
+              <th style="text-align:center; width:110px;">${headers[1]}</th>
+              <th style="text-align:center; width:110px;">${headers[2]}</th>
             </tr>
           </thead>
           <tbody>
-            ${statements.map((stmt, sIdx) => {
-              const rowVal = matrixAns[stmt.id] || '';
+            ${rows.map((row, rIdx) => {
+              const selectedVal = matrixAns[rIdx];
+              const h1 = headers[1];
+              const h2 = headers[2];
               return `
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:10px 12px; font-size:0.92rem; color:var(--text-main); line-height:1.4;">
-                    <strong>${sIdx + 1}.</strong> ${stmt.text}
+                <tr>
+                  <td><strong>${rIdx + 1}.</strong> ${row.text}</td>
+                  <td style="text-align:center;">
+                    <label class="table-choice-label">
+                      <input type="radio" name="matrix_row_${q.id}_${rIdx}" value="${h1}" ${selectedVal === h1 ? 'checked' : ''} onchange="setStudentMatrixAnswer(${q.id}, ${rIdx}, '${h1}')">
+                      ${h1}
+                    </label>
                   </td>
-                  <td style="padding:10px 12px; text-align:center;">
-                    <input type="radio" name="matrix_row_${q.id}_${stmt.id}" value="True" ${rowVal === 'True' ? 'checked' : ''} onchange="setStudentMatrixValue('${q.id}', '${stmt.id}', 'True')">
-                  </td>
-                  <td style="padding:10px 12px; text-align:center;">
-                    <input type="radio" name="matrix_row_${q.id}_${stmt.id}" value="False" ${rowVal === 'False' ? 'checked' : ''} onchange="setStudentMatrixValue('${q.id}', '${stmt.id}', 'False')">
-                  </td>
-                  <td style="padding:10px 12px; text-align:center;">
-                    <input type="radio" name="matrix_row_${q.id}_${stmt.id}" value="Not Mentioned" ${rowVal === 'Not Mentioned' ? 'checked' : ''} onchange="setStudentMatrixValue('${q.id}', '${stmt.id}', 'Not Mentioned')">
+                  <td style="text-align:center;">
+                    <label class="table-choice-label">
+                      <input type="radio" name="matrix_row_${q.id}_${rIdx}" value="${h2}" ${selectedVal === h2 ? 'checked' : ''} onchange="setStudentMatrixAnswer(${q.id}, ${rIdx}, '${h2}')">
+                      ${h2}
+                    </label>
                   </td>
                 </tr>
               `;
@@ -470,12 +475,12 @@ function renderStudentPracticeCanvas(q) {
 
   canvas.innerHTML = `
     <div class="question-header">
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-        <span class="q-badge badge-blue">QUESTION ${q.number < 10 ? '0' + q.number : q.number}</span>
-        <span class="q-badge badge-amber">${q.questionType.toUpperCase()}</span>
-        <span class="q-badge" style="background:#e0f2fe; color:#0284c7;">HOTS ANALYSIS</span>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+        <span class="q-badge badge-blue">QUESTION 0${q.id < 10 ? '0' + q.id : q.id}</span>
+        <span class="q-badge badge-amber">${formatStudentQType(q.type)}</span>
+        ${q.hots ? '<span class="q-badge" style="background:#fee2e2; color:#dc2626; font-weight:800;">HOTS ANALYSIS</span>' : ''}
       </div>
-      <div class="question-stem-text" style="font-size:1.05rem; font-weight:700; color:var(--text-main); line-height:1.6; margin-bottom:16px;">
+      <div class="question-stem-text">
         ${q.prompt}
       </div>
     </div>
@@ -483,38 +488,47 @@ function renderStudentPracticeCanvas(q) {
     ${interactionHtml}
 
     <!-- CRITICAL REASONING & EVIDENCE AREA -->
-    <div class="student-reasoning-card" style="margin-top:20px; background:var(--bg-card-alt); border-radius:12px; padding:16px; border:1px solid var(--border-color);">
-      <label style="display:block; font-size:0.92rem; font-weight:800; color:var(--text-main); margin-bottom:6px;">
-        ✍️ Textual Evidence & Logical Reasoning (Kutipan Bukti Teks & Penalaran Kritis Siswa):
-      </label>
-      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
-        Tuliskan kalimat bukti dari teks (paragraf ke berapa) dan alasan logis mengapa Anda yakin memilih jawaban di atas.
+    <div class="reasoning-box-wrapper">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <label style="font-size:0.95rem; font-weight:900; color:var(--text-main);">
+          ✍️ Textual Evidence & Critical Reasoning (Bukti Teks & Penalaran Kritis Siswa):
+        </label>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
+        Tuliskan bukti paragraf berapa dan kalimat pendukung, serta argumen logis mengapa Anda memilih jawaban di atas.
       </p>
       <textarea
         id="student-reason-input-${q.id}"
         class="student-reason-textarea"
-        style="width:100%; min-height:85px; padding:12px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); font-family:var(--font-sans); font-size:0.92rem; line-height:1.5; resize:vertical;"
-        placeholder="Contoh: Jawaban saya didasarkan pada Paragraf 2 kalimat ke-3 yang menyatakan bahwa... Oleh karena itu..."
-        oninput="handleStudentReasonInput('${q.id}', this.value)"
+        style="width:100%; min-height:90px; padding:12px 14px; border-radius:10px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); font-family:var(--font-sans); font-size:0.95rem; line-height:1.5; resize:vertical;"
+        placeholder="Contoh: Berdasarkan Paragraf 2 kalimat ke-1 yang menyatakan bahwa... Oleh karena itu opsi ini paling tepat karena..."
+        oninput="handleStudentReasonInput(${q.id}, this.value)"
       >${studentReason}</textarea>
     </div>
 
     <!-- WORKSPACE NAVIGATION BUTTONS -->
-    <div class="workspace-action-nav" style="margin-top:24px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <div style="margin-top:24px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
       <button class="btn btn-secondary" onclick="prevStudentQuestion()" ${StudentState.currentQuestionIndex === 0 ? 'disabled' : ''}>
         ◄ Previous Question
       </button>
 
       <div style="display:flex; gap:10px;">
         <button class="btn btn-outline" onclick="setStudentView('worksheet_summary')">
-          📋 View Answer Sheet
+          📋 My Answer Sheet
         </button>
         <button class="btn btn-primary" onclick="nextStudentQuestion()">
-          ${StudentState.currentQuestionIndex === MASTER_QUESTIONS.length - 1 ? 'Finish & Check Summary →' : 'Next Question ►'}
+          ${StudentState.currentQuestionIndex === MASTER_QUESTIONS.length - 1 ? 'Check Summary Sheet →' : 'Next Question ►'}
         </button>
       </div>
     </div>
   `;
+}
+
+function formatStudentQType(type) {
+  if (type === 'mc') return 'Multiple Choice';
+  if (type === 'mcma') return 'Multiple Response';
+  if (type === 'matrix') return 'Categorization / Matrix';
+  return type.toUpperCase();
 }
 
 // Option selection handlers
@@ -527,7 +541,7 @@ function selectStudentSingleAnswer(qId, optId) {
   }
   saveStudentData();
   renderStudentWorkspace();
-  showStudentToast(`✅ Option ${optId} selected`);
+  showStudentToast(`✅ Option ${optId} Selected`);
 }
 
 function toggleStudentMultiAnswer(qId, optId) {
@@ -547,14 +561,17 @@ function toggleStudentMultiAnswer(qId, optId) {
   renderStudentWorkspace();
 }
 
-function setStudentMatrixValue(qId, statementId, val) {
+function setStudentMatrixAnswer(qId, rIdx, val) {
+  const q = MASTER_QUESTIONS.find(item => item.id === qId);
+  const rowCount = q && q.matrixRows ? q.matrixRows.length : 2;
+
   if (!StudentState.answers[qId]) {
-    StudentState.answers[qId] = { answer: {}, reason: '', timestamp: Date.now() };
+    StudentState.answers[qId] = { answer: new Array(rowCount).fill(null), reason: '', timestamp: Date.now() };
   }
-  if (typeof StudentState.answers[qId].answer !== 'object' || Array.isArray(StudentState.answers[qId].answer) || StudentState.answers[qId].answer === null) {
-    StudentState.answers[qId].answer = {};
+  if (!Array.isArray(StudentState.answers[qId].answer)) {
+    StudentState.answers[qId].answer = new Array(rowCount).fill(null);
   }
-  StudentState.answers[qId].answer[statementId] = val;
+  StudentState.answers[qId].answer[rIdx] = val;
   StudentState.answers[qId].timestamp = Date.now();
   saveStudentData();
   renderStudentQNav();
@@ -616,12 +633,16 @@ function changeStudentFontSize(delta) {
   } else {
     StudentState.fontSizeLevel = Math.max(-1, Math.min(2, StudentState.fontSizeLevel + delta));
   }
+  saveStudentData();
   applyStudentTypography();
+  showStudentToast(`🔍 Font Size: ${StudentState.fontSizeLevel === -1 ? 'Small' : StudentState.fontSizeLevel === 0 ? 'Default' : StudentState.fontSizeLevel === 1 ? 'Large' : 'Extra Large'}`);
 }
 
 function toggleStudentFontFamily() {
   StudentState.fontFamily = StudentState.fontFamily === 'serif' ? 'sans' : 'serif';
+  saveStudentData();
   applyStudentTypography();
+  showStudentToast(`🔤 Font Family: ${StudentState.fontFamily === 'serif' ? 'Merriweather (Serif)' : 'Inter (Sans-Serif)'}`);
 }
 
 function applyStudentTypography() {
@@ -633,10 +654,11 @@ function applyStudentTypography() {
   }
 
   if (readPanel) {
-    readPanel.classList.remove('font-serif', 'font-sans', 'size-sm', 'size-md', 'size-lg');
+    readPanel.classList.remove('font-serif', 'font-sans', 'size-sm', 'size-normal', 'size-md', 'size-lg');
     readPanel.classList.add(StudentState.fontFamily === 'serif' ? 'font-serif' : 'font-sans');
 
     if (StudentState.fontSizeLevel === -1) readPanel.classList.add('size-sm');
+    else if (StudentState.fontSizeLevel === 0) readPanel.classList.add('size-normal');
     else if (StudentState.fontSizeLevel === 1) readPanel.classList.add('size-md');
     else if (StudentState.fontSizeLevel === 2) readPanel.classList.add('size-lg');
   }
@@ -656,9 +678,9 @@ function openPeekModal() {
   if (body) {
     const paragraphs = pass.text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     body.innerHTML = paragraphs.map((p, idx) => `
-      <div class="reading-paragraph" style="margin-bottom:12px;">
-        <span class="p-num" style="display:inline-block; margin-right:6px;">${idx + 1}</span>
-        <p style="display:inline; line-height:1.6; font-size:0.95rem;">${p.trim()}</p>
+      <div class="reading-paragraph" style="margin-bottom:14px;">
+        <span class="p-number" style="position:static; display:inline-block; margin-right:6px;">${idx + 1}</span>
+        <span class="reading-text" style="line-height:1.6; font-size:0.98rem;">${p.trim()}</span>
       </div>
     `).join('');
   }
@@ -697,7 +719,6 @@ function renderStudentVocabLab() {
     );
   }
 
-  // Render Based on Active Mode
   if (currentMode === 'flipcard') {
     renderVocabFlipCards(container, filteredVocab);
   } else if (currentMode === 'matching') {
@@ -741,36 +762,62 @@ function renderVocabFlipCards(container, list) {
   }
 
   container.innerHTML = `
-    <div style="margin:16px 0; font-size:0.92rem; color:var(--text-muted);">
-      Showing <strong>${list.length}</strong> terms. Click or tap any card to flip and view contextual definition. Click 🔊 for audio pronunciation.
+    <div style="margin:16px 0 10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="font-size:0.95rem; color:var(--text-muted);">
+        Displaying <strong>${list.length}</strong> specialized terms. Tap card to flip. Click 🔊 to hear native pronunciation.
+      </div>
     </div>
-    <div class="flipcard-grid">
+    <div class="flip-cards-grid">
       ${list.map(v => `
-        <div class="flipcard-wrapper" onclick="toggleCardFlip(this)">
-          <div class="flipcard-inner">
-            <!-- FRONT -->
-            <div class="flipcard-front">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span class="vocab-pos-badge">${v.pos || 'Term'}</span>
-                <button class="btn-tts" onclick="event.stopPropagation(); speakStudentWord('${v.word.replace(/'/g, "\\'")}');" title="Listen Audio Pronunciation">
-                  🔊
-                </button>
+        <div class="flip-card-wrapper">
+          <div class="flip-card-inner" onclick="toggleCardFlip(this)">
+            
+            <!-- FRONT CARD -->
+            <div class="flip-card-front">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="vocab-pos-badge">${v.pos || 'Term'}</span>
+                  <button class="btn-tts-speaker" onclick="event.stopPropagation(); speakStudentWord('${v.word.replace(/'/g, "\\'")}', this);" title="Pronounce Word">
+                    🔊 Pronounce
+                  </button>
+                </div>
+                <h3 class="flip-card-word">${v.word}</h3>
+                <div class="flip-card-phonetic">${v.phonetic || ''}</div>
               </div>
-              <h3 class="flipcard-word">${v.word}</h3>
-              <div class="flipcard-phonetic">${v.phonetic || ''}</div>
-              <div class="flipcard-hint">💡 Tap to reveal meaning & sentence ↻</div>
+
+              <div>
+                <div class="flip-hint-badge">
+                  💡 Tap to Flip Meaning & Context ↻
+                </div>
+              </div>
             </div>
 
-            <!-- BACK -->
-            <div class="flipcard-back">
-              <div class="flipcard-arti">${v.arti}</div>
-              <div class="flipcard-simple"><strong>Makna Sederhana:</strong> ${v.simpleMeaning || v.contextualMeaning}</div>
-              <div class="flipcard-sentence">"${v.sentence || ''}"</div>
-              <div class="flipcard-footer">
-                <span>📌 ${v.relatedQuestion || 'Text Reference'}</span>
-                <button class="btn-tts-sm" onclick="event.stopPropagation(); speakStudentWord('${v.word.replace(/'/g, "\\'")}');">🔊 Listen</button>
+            <!-- BACK CARD -->
+            <div class="flip-card-back">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                  <span class="vocab-pos-badge" style="background:#dcfce7; color:#166534;">DEFINISI & KONTEKS</span>
+                  <button class="btn-tts-speaker" onclick="event.stopPropagation(); speakStudentWord('${v.word.replace(/'/g, "\\'")}', this);">
+                    🔊 Listen
+                  </button>
+                </div>
+                <div style="font-size:1.15rem; font-weight:800; color:var(--text-main); margin-bottom:8px; line-height:1.4;">
+                  ${v.arti}
+                </div>
+                <div style="font-size:0.88rem; color:var(--text-secondary); background:var(--bg-card); padding:8px 12px; border-radius:8px; margin-bottom:8px; line-height:1.4;">
+                  <strong>Makna Kontekstual:</strong> ${v.contextualMeaning || v.simpleMeaning}
+                </div>
+                <div style="font-size:0.82rem; color:var(--text-muted); font-style:italic; line-height:1.4;">
+                  "${v.sentence || ''}"
+                </div>
+              </div>
+
+              <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-muted);">
+                <span>📌 ${v.relatedQuestion || 'Wacana TKA'}</span>
+                <span style="font-weight:700; color:var(--academic-blue);">Tap to Flip Back ↻</span>
               </div>
             </div>
+
           </div>
         </div>
       `).join('')}
@@ -784,14 +831,12 @@ function toggleCardFlip(el) {
 
 // Mode 2: Match Words Game
 function renderVocabMatchingGame(container, list) {
-  // Take 6 random pairs from list
   const sample = [...list].sort(() => 0.5 - Math.random()).slice(0, 6);
   if (sample.length < 3) {
-    container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">Need at least 3 terms to play matching game. Please choose 'All Passages'.</div>`;
+    container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">Need at least 3 terms to play matching game. Please select 'All Passages'.</div>`;
     return;
   }
 
-  // Prepare shuffled left & right
   const leftItems = sample.map(v => ({ id: v.id, word: v.word })).sort(() => 0.5 - Math.random());
   const rightItems = sample.map(v => ({ id: v.id, arti: v.arti })).sort(() => 0.5 - Math.random());
 
@@ -802,20 +847,20 @@ function renderVocabMatchingGame(container, list) {
   };
 
   container.innerHTML = `
-    <div style="background:var(--bg-card); border-radius:14px; padding:24px; border:1px solid var(--border-color); margin-top:16px;">
+    <div style="background:var(--bg-card); border-radius:16px; padding:24px; border:1px solid var(--border-color); margin-top:16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
         <div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main);">🧩 Match the Specialized Terms with Indonesian Meanings</h3>
-          <p style="font-size:0.88rem; color:var(--text-muted);">Select one English term on the left, then click its corresponding meaning on the right.</p>
+          <h3 style="font-size:1.3rem; font-weight:900; color:var(--text-main);">🧩 Match Specialized Terms with Indonesian Meanings</h3>
+          <p style="font-size:0.92rem; color:var(--text-muted);">Select one English term on the left, then click its corresponding definition on the right.</p>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="renderStudentVocabLab()">🔄 New Round</button>
       </div>
 
-      <div class="matching-grid-container" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div class="matching-grid-container" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
         <!-- Left column -->
         <div id="matching-left-col" style="display:flex; flex-direction:column; gap:12px;">
           ${leftItems.map(item => `
-            <div class="match-card match-left" data-id="${item.id}" onclick="handleMatchSelect('left', ${item.id})">
+            <div class="match-card match-left" data-id="${item.id}" onclick="handleMatchSelect('left', ${item.id})" style="background:var(--bg-card-alt); padding:14px 18px; border-radius:12px; border:1.5px solid var(--border-color); font-weight:800; font-size:1rem; cursor:pointer; transition:all 0.2s ease;">
               ${item.word}
             </div>
           `).join('')}
@@ -824,15 +869,15 @@ function renderVocabMatchingGame(container, list) {
         <!-- Right column -->
         <div id="matching-right-col" style="display:flex; flex-direction:column; gap:12px;">
           ${rightItems.map(item => `
-            <div class="match-card match-right" data-id="${item.id}" onclick="handleMatchSelect('right', ${item.id})">
+            <div class="match-card match-right" data-id="${item.id}" onclick="handleMatchSelect('right', ${item.id})" style="background:var(--bg-card-alt); padding:14px 18px; border-radius:12px; border:1.5px solid var(--border-color); font-weight:600; font-size:0.92rem; cursor:pointer; line-height:1.4; transition:all 0.2s ease;">
               ${item.arti}
             </div>
           `).join('')}
         </div>
       </div>
 
-      <div id="matching-win-banner" style="display:none; margin-top:20px; text-align:center; padding:16px; background:#dcfce7; border-radius:12px; color:#166534; font-weight:800;">
-        🎉 Great job! All 6 pairs matched correctly!
+      <div id="matching-win-banner" style="display:none; margin-top:20px; text-align:center; padding:18px; background:#dcfce7; border-radius:12px; color:#166534; font-weight:900; font-size:1.1rem;">
+        🎉 Awesome! All pairs matched correctly!
       </div>
     </div>
   `;
@@ -845,25 +890,35 @@ function handleMatchSelect(col, id) {
   if (col === 'left') {
     state.selectedLeft = id;
     document.querySelectorAll('.match-left').forEach(el => {
-      if (parseInt(el.getAttribute('data-id'), 10) === id) el.classList.add('selected');
-      else el.classList.remove('selected');
+      if (parseInt(el.getAttribute('data-id'), 10) === id) {
+        el.style.borderColor = 'var(--academic-blue)';
+        el.style.background = 'var(--accent-cyan-light)';
+      } else if (!state.matchedPairs.includes(parseInt(el.getAttribute('data-id'), 10))) {
+        el.style.borderColor = 'var(--border-color)';
+        el.style.background = 'var(--bg-card-alt)';
+      }
     });
   } else if (col === 'right') {
     state.selectedRight = id;
     document.querySelectorAll('.match-right').forEach(el => {
-      if (parseInt(el.getAttribute('data-id'), 10) === id) el.classList.add('selected');
-      else el.classList.remove('selected');
+      if (parseInt(el.getAttribute('data-id'), 10) === id) {
+        el.style.borderColor = 'var(--academic-blue)';
+        el.style.background = 'var(--accent-cyan-light)';
+      } else if (!state.matchedPairs.includes(parseInt(el.getAttribute('data-id'), 10))) {
+        el.style.borderColor = 'var(--border-color)';
+        el.style.background = 'var(--bg-card-alt)';
+      }
     });
   }
 
   // Check if both selected
   if (state.selectedLeft !== null && state.selectedRight !== null) {
     if (state.selectedLeft === state.selectedRight) {
-      // MATCH!
       state.matchedPairs.push(state.selectedLeft);
       document.querySelectorAll(`[data-id="${state.selectedLeft}"]`).forEach(el => {
-        el.classList.remove('selected');
-        el.classList.add('matched');
+        el.style.background = '#dcfce7';
+        el.style.borderColor = '#16a34a';
+        el.style.color = '#166534';
       });
       showStudentToast('🎯 Correct Match!');
       if (state.matchedPairs.length === 6) {
@@ -871,12 +926,22 @@ function handleMatchSelect(col, id) {
         if (win) win.style.display = 'block';
       }
     } else {
-      // MISMATCH!
-      showStudentToast('❌ Not a match, try again!');
-      document.querySelectorAll('.match-card.selected').forEach(el => {
-        el.classList.add('shake');
-        setTimeout(() => el.classList.remove('shake', 'selected'), 500);
-      });
+      showStudentToast('❌ Incorrect Match, try again!');
+      const leftEl = document.querySelector(`.match-left[data-id="${state.selectedLeft}"]`);
+      const rightEl = document.querySelector(`.match-right[data-id="${state.selectedRight}"]`);
+      if (leftEl) leftEl.style.borderColor = '#ef4444';
+      if (rightEl) rightEl.style.borderColor = '#ef4444';
+
+      setTimeout(() => {
+        if (leftEl && !state.matchedPairs.includes(state.selectedLeft)) {
+          leftEl.style.borderColor = 'var(--border-color)';
+          leftEl.style.background = 'var(--bg-card-alt)';
+        }
+        if (rightEl && !state.matchedPairs.includes(state.selectedRight)) {
+          rightEl.style.borderColor = 'var(--border-color)';
+          rightEl.style.background = 'var(--bg-card-alt)';
+        }
+      }, 500);
     }
     state.selectedLeft = null;
     state.selectedRight = null;
@@ -886,18 +951,14 @@ function handleMatchSelect(col, id) {
 // Mode 3: Context Challenge
 function renderVocabContextChallenge(container, list) {
   if (list.length < 4) {
-    container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">Need more terms for context quiz. Please choose 'All Passages'.</div>`;
+    container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">Need more terms for context quiz. Please select 'All Passages'.</div>`;
     return;
   }
 
-  // Build 5 questions
   const questions = [...list].sort(() => 0.5 - Math.random()).slice(0, 5).map(target => {
     const distractors = list.filter(v => v.id !== target.id).sort(() => 0.5 - Math.random()).slice(0, 3);
     const options = [target, ...distractors].sort(() => 0.5 - Math.random());
-    return {
-      target,
-      options
-    };
+    return { target, options };
   });
 
   StudentState.contextQuizState = {
@@ -915,37 +976,37 @@ function renderCurrentContextQuizStep(container) {
   const current = state.questions[state.currentIndex];
   if (!current) {
     container.innerHTML = `
-      <div style="background:var(--bg-card); border-radius:14px; padding:30px; text-align:center; border:1px solid var(--border-color); margin-top:16px;">
-        <h3 style="font-size:1.8rem; font-weight:900; color:var(--text-main); margin-bottom:10px;">🏆 Challenge Complete!</h3>
-        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:20px;">
+      <div style="background:var(--bg-card); border-radius:16px; padding:36px; text-align:center; border:1px solid var(--border-color); margin-top:16px;">
+        <h3 style="font-size:2rem; font-weight:900; color:var(--text-main); margin-bottom:12px;">🏆 Context Quiz Completed!</h3>
+        <p style="font-size:1.15rem; color:var(--text-secondary); margin-bottom:24px;">
           You scored <strong>${state.score} / ${state.questions.length}</strong> in the Context Vocab Challenge!
         </p>
-        <button class="btn btn-primary" onclick="setStudentVocabActivity('context')">🔄 Play Again</button>
+        <button class="btn btn-primary btn-lg" onclick="setStudentVocabActivity('context')">🔄 Play Again</button>
       </div>
     `;
     return;
   }
 
   container.innerHTML = `
-    <div style="background:var(--bg-card); border-radius:14px; padding:24px; border:1px solid var(--border-color); margin-top:16px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <div style="background:var(--bg-card); border-radius:16px; padding:26px; border:1px solid var(--border-color); margin-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
         <span class="q-badge badge-blue">Question ${state.currentIndex + 1} of ${state.questions.length}</span>
-        <span style="font-weight:800; color:var(--academic-blue);">Score: ${state.score}</span>
+        <span style="font-weight:900; color:var(--academic-blue); font-size:1.1rem;">Score: ${state.score}</span>
       </div>
 
-      <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); margin-bottom:8px;">
+      <div style="font-size:1.15rem; font-weight:800; color:var(--text-main); margin-bottom:12px;">
         Which term best matches the following meaning/context?
       </div>
-      <div style="font-size:1.05rem; background:var(--bg-card-alt); padding:16px; border-radius:10px; border-left:4px solid var(--academic-blue); color:var(--text-secondary); margin-bottom:20px; line-height:1.5;">
+      <div style="font-size:1.1rem; background:var(--bg-card-alt); padding:18px; border-radius:12px; border-left:5px solid var(--academic-blue); color:var(--text-main); margin-bottom:24px; line-height:1.5;">
         "${current.target.arti}"
-        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;">Context: ${current.target.contextualMeaning || current.target.simpleMeaning}</div>
+        <div style="font-size:0.9rem; color:var(--text-muted); margin-top:8px;"><strong>Context:</strong> ${current.target.contextualMeaning || current.target.simpleMeaning}</div>
       </div>
 
-      <div class="options-container">
+      <div class="options-list">
         ${current.options.map(opt => `
           <div class="option-card" onclick="handleContextQuizSelect(${opt.id}, ${current.target.id})">
-            <span class="option-pill" style="font-size:0.8rem;">${opt.pos || 'Term'}</span>
-            <span class="option-text" style="font-weight:700;">${opt.word}</span>
+            <span class="vocab-pos-badge" style="font-size:0.75rem;">${opt.pos || 'Term'}</span>
+            <span class="opt-text" style="font-weight:800; font-size:1.05rem; margin-left:8px;">${opt.word}</span>
           </div>
         `).join('')}
       </div>
@@ -969,43 +1030,43 @@ function handleContextQuizSelect(selectedId, targetId) {
 // Mode 4: Searchable Word Master Table
 function renderVocabMasterTable(container, list) {
   container.innerHTML = `
-    <div style="background:var(--bg-card); border-radius:14px; padding:20px; border:1px solid var(--border-color); margin-top:16px;">
-      <div style="margin-bottom:16px; display:flex; gap:12px; align-items:center;">
+    <div style="background:var(--bg-card); border-radius:16px; padding:24px; border:1px solid var(--border-color); margin-top:16px;">
+      <div style="margin-bottom:18px; display:flex; gap:12px; align-items:center;">
         <input
           type="text"
           id="input-vocab-search"
-          placeholder="🔍 Search 90 terms, definitions, phonetics..."
-          style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-card-alt); color:var(--text-main); font-size:0.95rem;"
+          placeholder="🔍 Search 90 specialized terms, definitions, phonetics..."
+          style="width:100%; padding:12px 16px; border-radius:10px; border:1.5px solid var(--border-color); background:var(--bg-card-alt); color:var(--text-main); font-size:1rem;"
           value="${StudentState.vocabSearchQuery}"
           oninput="handleVocabSearch(this.value)"
         >
       </div>
 
       <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.92rem;">
           <thead>
             <tr style="background:var(--bg-card-alt); text-align:left; border-bottom:2px solid var(--border-color);">
-              <th style="padding:10px 12px;">#</th>
-              <th style="padding:10px 12px;">English Term</th>
-              <th style="padding:10px 12px;">Phonetic & POS</th>
-              <th style="padding:10px 12px;">Arti (Indonesian)</th>
-              <th style="padding:10px 12px;">Context & Sentence</th>
-              <th style="padding:10px 12px;">Audio</th>
+              <th style="padding:12px;">#</th>
+              <th style="padding:12px;">English Term</th>
+              <th style="padding:12px;">Phonetic & POS</th>
+              <th style="padding:12px;">Arti (Indonesian)</th>
+              <th style="padding:12px;">Context & Sentence</th>
+              <th style="padding:12px; text-align:center;">Audio</th>
             </tr>
           </thead>
           <tbody>
-            ${list.map((v, idx) => `
+            ${list.map((v) => `
               <tr style="border-bottom:1px solid var(--border-color);">
-                <td style="padding:10px 12px; color:var(--text-muted);">${v.id}</td>
-                <td style="padding:10px 12px; font-weight:800; color:var(--academic-blue);">${v.word}</td>
-                <td style="padding:10px 12px; color:var(--text-muted);"><small>${v.phonetic || ''}<br><em>${v.pos || ''}</em></small></td>
-                <td style="padding:10px 12px; color:var(--text-main); font-weight:600;">${v.arti}</td>
-                <td style="padding:10px 12px; color:var(--text-secondary); font-size:0.85rem; line-height:1.4;">
+                <td style="padding:12px; color:var(--text-muted); font-weight:700;">${v.id}</td>
+                <td style="padding:12px; font-weight:900; color:var(--academic-blue); font-size:1.05rem;">${v.word}</td>
+                <td style="padding:12px; color:var(--text-muted);"><small>${v.phonetic || ''}<br><em style="color:var(--text-secondary); font-weight:700;">${v.pos || ''}</em></small></td>
+                <td style="padding:12px; color:var(--text-main); font-weight:700;">${v.arti}</td>
+                <td style="padding:12px; color:var(--text-secondary); font-size:0.88rem; line-height:1.45;">
                   ${v.simpleMeaning || v.contextualMeaning}<br>
                   <em style="color:var(--text-muted);">"${v.sentence || ''}"</em>
                 </td>
-                <td style="padding:10px 12px; text-align:center;">
-                  <button class="btn-tts-sm" onclick="speakStudentWord('${v.word.replace(/'/g, "\\'")}');">🔊</button>
+                <td style="padding:12px; text-align:center;">
+                  <button class="btn-tts-speaker" onclick="speakStudentWord('${v.word.replace(/'/g, "\\'")}', this);">🔊</button>
                 </td>
               </tr>
             `).join('')}
@@ -1021,20 +1082,27 @@ function handleVocabSearch(val) {
   renderStudentVocabLab();
 }
 
-function speakStudentWord(word) {
+function speakStudentWord(word, btnEl) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = 'en-US';
-    utterance.rate = 0.9;
+    utterance.rate = 0.88;
+
+    if (btnEl) {
+      btnEl.classList.add('speaking');
+      utterance.onend = () => btnEl.classList.remove('speaking');
+      utterance.onerror = () => btnEl.classList.remove('speaking');
+    }
+
     window.speechSynthesis.speak(utterance);
   } else {
-    showStudentToast('⚠️ Speech Synthesis not supported on this browser');
+    showStudentToast('⚠️ Audio speech not supported on this browser');
   }
 }
 
 // ==========================================
-// 4. STRATEGY GUIDE VIEW
+// 4. STRATEGY GUIDE VIEW (IMPROVED)
 // ==========================================
 function renderStudentStrategy() {
   const container = document.getElementById('student-strategy-cards-container');
@@ -1043,35 +1111,54 @@ function renderStudentStrategy() {
   container.innerHTML = '';
   STRATEGIES.forEach(strat => {
     const card = document.createElement('div');
-    card.className = 'strategy-card';
+    card.className = 'strategy-card-improved';
     card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <span class="strategy-badge">${strat.category}</span>
-        <span style="font-size:0.8rem; color:var(--text-muted);">${strat.id.toUpperCase()}</span>
-      </div>
-      <h3 class="strategy-title">${strat.title}</h3>
-      <p class="strategy-short-desc">${strat.shortExplanation}</p>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span class="strategy-badge-pill">${strat.category}</span>
+          <span style="font-size:0.85rem; font-weight:800; color:var(--text-muted);">${strat.id.toUpperCase()}</span>
+        </div>
+        <h3 class="strategy-card-title">${strat.title}</h3>
+        <p class="strategy-card-desc">${strat.shortExplanation}</p>
 
-      <div style="margin-top:14px; background:var(--bg-card-alt); border-radius:10px; padding:12px; border:1px solid var(--border-color);">
-        <div style="font-size:0.85rem; font-weight:800; color:var(--academic-blue); margin-bottom:6px;">📋 Step-by-Step Method:</div>
-        <ul style="margin:0; padding-left:18px; font-size:0.85rem; color:var(--text-secondary); line-height:1.5;">
-          ${strat.howToDo.map(step => `<li>${step}</li>`).join('')}
-        </ul>
+        <div class="strategy-steps-box" style="margin-top:16px;">
+          <div class="strategy-steps-title">📋 Step-by-Step Method (Langkah Eksekusi):</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${strat.howToDo.map(step => `<div class="strategy-step-item">• ${step}</div>`).join('')}
+          </div>
+        </div>
+
+        <div style="margin-top:12px; background:var(--accent-amber-light); border-radius:12px; padding:12px 16px; border:1px solid rgba(217, 119, 6, 0.3);">
+          <div style="font-size:0.85rem; font-weight:900; color:var(--accent-amber); margin-bottom:4px;">💡 Quick Tip HOTS:</div>
+          <div style="font-size:0.88rem; color:var(--text-secondary); line-height:1.4;">${strat.quickTip || strat.shortExplanation}</div>
+        </div>
+
+        <div class="strategy-trap-box" style="margin-top:10px;">
+          <div style="font-size:0.85rem; font-weight:900; margin-bottom:4px;">⚠️ Distractor Trap Alert:</div>
+          <div style="font-size:0.85rem; line-height:1.4;">${strat.trapAlert || 'Waspadai pilihan jawaban yang hanya mengulang kata kunci tanpa menjawab inti pertanyaan secara komprehensif.'}</div>
+        </div>
       </div>
 
-      <div style="margin-top:10px; background:var(--accent-amber-light); border-radius:10px; padding:10px 12px; border:1px solid rgba(217, 119, 6, 0.2);">
-        <div style="font-size:0.82rem; font-weight:800; color:var(--accent-amber); margin-bottom:4px;">⚠️ Distractor Trap Alert:</div>
-        <p style="margin:0; font-size:0.82rem; color:var(--text-secondary); line-height:1.4;">
-          ${strat.trapAlert || 'Waspadai opsi yang mengulang kata persis dari teks namun mengubah relasi logika atau makna utamanya.'}
-        </p>
+      <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border-color);">
+        <div style="font-size:0.82rem; font-weight:800; color:var(--text-muted); margin-bottom:8px;">Appears in Questions:</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          ${(strat.appearsIn || []).map(qNum => `
+            <button class="btn btn-outline btn-sm" onclick="goToQuestionFromStrategy(${qNum})">Q${qNum < 10 ? '0' + qNum : qNum}</button>
+          `).join('')}
+        </div>
       </div>
     `;
     container.appendChild(card);
   });
 }
 
+function goToQuestionFromStrategy(qNum) {
+  StudentState.currentQuestionIndex = qNum - 1;
+  setStudentView('student_workspace');
+}
+
 // ==========================================
-// 5. WORKSHEET SUMMARY & CHECK VIEW
+// 5. WORKSHEET SUMMARY & SELF-EVALUATION
 // ==========================================
 function renderStudentSummary() {
   const container = document.getElementById('student-summary-container');
@@ -1088,17 +1175,21 @@ function renderStudentSummary() {
     return rec && rec.reason && rec.reason.trim().length > 3;
   }).length;
 
-  const pct = Math.round((answered / total) * 100);
+  const evals = StudentState.evaluations || {};
+  const correctCount = Object.values(evals).filter(v => v === 'correct').length;
+  const incorrectCount = Object.values(evals).filter(v => v === 'incorrect').length;
+  const evaluatedCount = correctCount + incorrectCount;
+  const scorePercent = evaluatedCount > 0 ? Math.round((correctCount / total) * 100) : 0;
 
   container.innerHTML = `
-    <!-- Header Card -->
-    <div style="background:var(--bg-card); border-radius:14px; padding:24px; border:1px solid var(--border-color); margin-bottom:24px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:16px;">
+    <!-- Summary Header Card -->
+    <div style="background:var(--bg-card); border-radius:16px; padding:26px; border:1px solid var(--border-color); margin-bottom:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
         <div>
-          <span class="q-badge badge-blue">STUDENT WORKSHEET SUMMARY</span>
-          <h2 style="font-size:1.6rem; font-weight:900; color:var(--text-main); margin-top:6px;">📋 My Complete Answer Sheet</h2>
-          <p style="font-size:0.92rem; color:var(--text-muted);">
-            TKA Bahasa Inggris SMA 2025 Pilihan • 30 Soal HOTS & Lembar Penalaran Kritis
+          <span class="q-badge badge-blue">STUDENT REASONING WORKSHEET</span>
+          <h2 style="font-size:1.75rem; font-weight:900; color:var(--text-main); margin-top:6px;">📋 My Complete Answer Sheet</h2>
+          <p style="font-size:0.95rem; color:var(--text-muted);">
+            Latihan TKA Bahasa Inggris SMA 2025 Pilihan • Rekapitulasi Bukti Teks & Evaluasi Mandiri Siswa
           </p>
         </div>
         <div style="display:flex; gap:10px;">
@@ -1108,78 +1199,99 @@ function renderStudentSummary() {
       </div>
 
       <!-- Student Profile Badge Box -->
-      <div class="summary-profile-box" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; background:var(--bg-card-alt); padding:16px; border-radius:10px; border:1px solid var(--border-color); margin-bottom:20px;">
-        <div><strong>Student Name:</strong> <span style="color:var(--academic-blue);">${StudentState.profile.name || '(Not Filled)'}</span></div>
-        <div><strong>Class / Group:</strong> <span style="color:var(--academic-blue);">${StudentState.profile.class || '(Not Filled)'}</span></div>
+      <div class="summary-profile-box" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; background:var(--bg-card-alt); padding:18px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
+        <div><strong>Student Name:</strong> <span style="color:var(--academic-blue); font-weight:800;">${StudentState.profile.name || '(Not Filled)'}</span></div>
+        <div><strong>Class / Group:</strong> <span style="color:var(--academic-blue); font-weight:800;">${StudentState.profile.class || '(Not Filled)'}</span></div>
         <div><strong>School:</strong> <span>${StudentState.profile.school || 'SMA Plus PGRI Cibinong'}</span></div>
         <div><strong>Advisor / Teacher:</strong> <span>${StudentState.profile.teacher || 'Muhammad Falahaen Jiddan, M.Pd. Gr.'}</span></div>
       </div>
 
-      <!-- Progress Stats -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
-        <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border-color); text-align:center;">
-          <div style="font-size:1.4rem; font-weight:900; color:var(--academic-blue);">${answered}/${total}</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">Questions Answered</div>
+      <!-- Live Self-Evaluation Scoreboard -->
+      <div class="eval-score-card">
+        <div>
+          <div style="font-size:0.85rem; color:#94a3b8; font-weight:800; text-transform:uppercase;">Self-Correction Score:</div>
+          <div style="font-size:2.2rem; font-weight:900; color:#38bdf8;">${correctCount} / ${total} <small style="font-size:1.1rem; color:#f1f5f9;">(${scorePercent}%)</small></div>
         </div>
-        <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border-color); text-align:center;">
-          <div style="font-size:1.4rem; font-weight:900; color:#059669;">${reasoned}/${total}</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">Reasoning Written</div>
-        </div>
-        <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border-color); text-align:center;">
-          <div style="font-size:1.4rem; font-weight:900; color:var(--accent-purple);">${pct}%</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">Completion Rate</div>
+        <div style="display:flex; gap:16px;">
+          <div>
+            <div style="font-size:0.82rem; color:#4ade80; font-weight:800;">✅ Benar (Correct)</div>
+            <div style="font-size:1.4rem; font-weight:900; color:#4ade80;">${correctCount}</div>
+          </div>
+          <div>
+            <div style="font-size:0.82rem; color:#f87171; font-weight:800;">❌ Salah (Incorrect)</div>
+            <div style="font-size:1.4rem; font-weight:900; color:#f87171;">${incorrectCount}</div>
+          </div>
+          <div>
+            <div style="font-size:0.82rem; color:#cbd5e1; font-weight:800;">⏳ Belum Dinilai</div>
+            <div style="font-size:1.4rem; font-weight:900; color:#cbd5e1;">${total - evaluatedCount}</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Summary Questions Table -->
-    <div style="background:var(--bg-card); border-radius:14px; padding:20px; border:1px solid var(--border-color);">
-      <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin-bottom:16px;">
-        📝 Detailed Question-by-Question Worksheet:
+    <!-- Questions Detailed List -->
+    <div style="background:var(--bg-card); border-radius:16px; padding:24px; border:1px solid var(--border-color);">
+      <h3 style="font-size:1.3rem; font-weight:900; color:var(--text-main); margin-bottom:18px;">
+        📝 Detailed Question-by-Question Worksheet & Self-Correction:
       </h3>
 
-      <div style="display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; flex-direction:column; gap:18px;">
         ${MASTER_QUESTIONS.map(q => {
           const ansRec = StudentState.answers[q.id] || { answer: null, reason: '' };
           const hasAns = ansRec.answer !== undefined && ansRec.answer !== null && ansRec.answer !== '' && (!Array.isArray(ansRec.answer) || ansRec.answer.length > 0);
           
-          let displayAns = '<span style="color:var(--text-muted);">[Belum Dijawab]</span>';
+          let displayAns = '<span style="color:var(--text-muted); font-style:italic;">[Belum Dijawab]</span>';
           if (hasAns) {
-            if (Array.isArray(ansRec.answer)) {
-              displayAns = `<span class="badge badge-blue">Options: ${ansRec.answer.join(', ')}</span>`;
-            } else if (typeof ansRec.answer === 'object') {
-              displayAns = Object.entries(ansRec.answer).map(([sId, val]) => `<div><small>${sId}: <strong>${val}</strong></small></div>`).join('');
-            } else {
-              displayAns = `<span class="badge badge-blue">Option: ${ansRec.answer}</span>`;
+            if (q.type === 'mc') {
+              displayAns = `<span class="badge badge-blue" style="font-size:0.92rem; font-weight:800;">Option: ${ansRec.answer}</span>`;
+            } else if (q.type === 'mcma') {
+              displayAns = `<span class="badge badge-blue" style="font-size:0.92rem; font-weight:800;">Options: ${Array.isArray(ansRec.answer) ? ansRec.answer.join(', ') : ansRec.answer}</span>`;
+            } else if (q.type === 'matrix') {
+              const rows = q.matrixRows || [];
+              const arr = Array.isArray(ansRec.answer) ? ansRec.answer : [];
+              displayAns = rows.map((r, i) => `<div><small><strong>${i + 1}.</strong> ${arr[i] ? arr[i] : '<em>(Belum dipilih)</em>'}</small></div>`).join('');
             }
           }
 
           const hasReason = ansRec.reason && ansRec.reason.trim().length > 0;
+          const curEval = evals[q.id] || null;
 
           return `
-            <div style="background:var(--bg-card-alt); border-radius:10px; padding:16px; border:1px solid var(--border-color);">
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+            <div style="background:var(--bg-card-alt); border-radius:14px; padding:18px; border:1.5px solid var(--border-color);">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                 <div>
-                  <span class="q-badge badge-blue">QUESTION 0${q.number < 10 ? '0' + q.number : q.number}</span>
-                  <span style="font-size:0.82rem; color:var(--text-muted); margin-left:6px;">(${q.textId.toUpperCase()})</span>
+                  <span class="q-badge badge-blue">QUESTION 0${q.id < 10 ? '0' + q.id : q.id}</span>
+                  <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-left:8px;">${q.textId.toUpperCase()} • ${formatStudentQType(q.type)}</span>
                 </div>
-                <button class="btn btn-outline btn-sm" onclick="goToQuestionFromSummary(${q.number})">✏️ Edit Answer</button>
+                
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:0.82rem; font-weight:800; color:var(--text-muted);">Self-Correction:</span>
+                  <div class="eval-btn-group">
+                    <button class="btn-eval correct ${curEval === 'correct' ? 'active' : ''}" onclick="setQuestionEvaluation(${q.id}, 'correct')">
+                      ✅ Benar
+                    </button>
+                    <button class="btn-eval incorrect ${curEval === 'incorrect' ? 'active' : ''}" onclick="setQuestionEvaluation(${q.id}, 'incorrect')">
+                      ❌ Salah
+                    </button>
+                  </div>
+                  <button class="btn btn-outline btn-sm" onclick="goToQuestionFromSummary(${q.id})" style="margin-left:4px;">✏️ Edit</button>
+                </div>
               </div>
 
-              <div style="font-weight:700; color:var(--text-main); font-size:0.95rem; margin-bottom:10px;">
+              <div style="font-weight:800; color:var(--text-main); font-size:1rem; margin-bottom:12px; line-height:1.4;">
                 ${q.prompt}
               </div>
 
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
-                <div style="background:var(--bg-card); padding:10px 14px; border-radius:8px; border:1px solid var(--border-color);">
-                  <div style="font-size:0.8rem; font-weight:800; color:var(--text-muted); margin-bottom:4px;">Selected Answer:</div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+                <div style="background:var(--bg-card); padding:12px 16px; border-radius:10px; border:1px solid var(--border-color);">
+                  <div style="font-size:0.82rem; font-weight:800; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase;">Selected Answer:</div>
                   <div>${displayAns}</div>
                 </div>
 
-                <div style="background:var(--bg-card); padding:10px 14px; border-radius:8px; border:1px solid var(--border-color);">
-                  <div style="font-size:0.8rem; font-weight:800; color:var(--text-muted); margin-bottom:4px;">Textual Evidence & Reasoning:</div>
-                  <div style="font-size:0.88rem; color:var(--text-secondary); line-height:1.4;">
-                    ${hasReason ? ansRec.reason : '<em style="color:var(--text-muted);">Tidak ada penalaran yang ditulis.</em>'}
+                <div style="background:var(--bg-card); padding:12px 16px; border-radius:10px; border:1px solid var(--border-color);">
+                  <div style="font-size:0.82rem; font-weight:800; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase;">Textual Evidence & Reasoning:</div>
+                  <div style="font-size:0.92rem; color:var(--text-secondary); line-height:1.45;">
+                    ${hasReason ? ansRec.reason : '<em style="color:var(--text-muted);">Tidak ada bukti teks atau penalaran yang dicatat.</em>'}
                   </div>
                 </div>
               </div>
@@ -1191,9 +1303,23 @@ function renderStudentSummary() {
   `;
 }
 
-function goToQuestionFromSummary(qNum) {
-  StudentState.currentQuestionIndex = qNum - 1;
-  setStudentView('student_workspace');
+function setQuestionEvaluation(qId, status) {
+  if (!StudentState.evaluations) StudentState.evaluations = {};
+  if (StudentState.evaluations[qId] === status) {
+    delete StudentState.evaluations[qId];
+  } else {
+    StudentState.evaluations[qId] = status;
+  }
+  saveStudentData();
+  renderStudentSummary();
+}
+
+function goToQuestionFromSummary(qId) {
+  const targetIndex = MASTER_QUESTIONS.findIndex(q => q.id === qId);
+  if (targetIndex !== -1) {
+    StudentState.currentQuestionIndex = targetIndex;
+    setStudentView('student_workspace');
+  }
 }
 
 function printStudentWorksheet() {
