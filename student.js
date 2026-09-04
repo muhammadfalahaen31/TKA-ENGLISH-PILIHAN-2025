@@ -409,9 +409,7 @@ function renderStudentPracticeCanvas(q) {
   else if (q.type === 'mcma') {
     const selectedArr = Array.isArray(studentAns) ? studentAns : [];
     interactionHtml = `
-      <div style="margin-bottom:12px; font-size:0.9rem; color:var(--academic-blue); font-weight:800;">
-        💡 Petunjuk: Anda dapat memilih lebih dari satu jawaban yang benar (Pilihan Ganda Kompleks).
-      </div>
+
       <div class="options-list">
         ${q.options.map(opt => {
           const isChecked = selectedArr.includes(opt.id);
@@ -432,9 +430,7 @@ function renderStudentPracticeCanvas(q) {
     const matrixAns = Array.isArray(studentAns) ? studentAns : new Array(rows.length).fill(null);
 
     interactionHtml = `
-      <div style="margin-bottom:12px; font-size:0.9rem; color:var(--academic-blue); font-weight:800;">
-        💡 Petunjuk: Tentukan kategori yang tepat untuk setiap pernyataan berikut:
-      </div>
+
       <div style="overflow-x:auto;">
         <table class="interactive-table">
           <thead>
@@ -1214,15 +1210,15 @@ function renderStudentSummary() {
         </div>
         <div style="display:flex; gap:16px;">
           <div>
-            <div style="font-size:0.82rem; color:#4ade80; font-weight:800;">✅ Benar (Correct)</div>
+            <div style="font-size:0.82rem; color:#4ade80; font-weight:800;">✅ Correct</div>
             <div style="font-size:1.4rem; font-weight:900; color:#4ade80;">${correctCount}</div>
           </div>
           <div>
-            <div style="font-size:0.82rem; color:#f87171; font-weight:800;">❌ Salah (Incorrect)</div>
+            <div style="font-size:0.82rem; color:#f87171; font-weight:800;">❌ Incorrect</div>
             <div style="font-size:1.4rem; font-weight:900; color:#f87171;">${incorrectCount}</div>
           </div>
           <div>
-            <div style="font-size:0.82rem; color:#cbd5e1; font-weight:800;">⏳ Belum Dinilai</div>
+            <div style="font-size:0.82rem; color:#cbd5e1; font-weight:800;">⏳ Pending Evaluation</div>
             <div style="font-size:1.4rem; font-weight:900; color:#cbd5e1;">${total - evaluatedCount}</div>
           </div>
         </div>
@@ -1268,10 +1264,10 @@ function renderStudentSummary() {
                   <span style="font-size:0.82rem; font-weight:800; color:var(--text-muted);">Self-Correction:</span>
                   <div class="eval-btn-group">
                     <button class="btn-eval correct ${curEval === 'correct' ? 'active' : ''}" onclick="setQuestionEvaluation(${q.id}, 'correct')">
-                      ✅ Benar
+                      ✅ Correct
                     </button>
                     <button class="btn-eval incorrect ${curEval === 'incorrect' ? 'active' : ''}" onclick="setQuestionEvaluation(${q.id}, 'incorrect')">
-                      ❌ Salah
+                      ❌ Incorrect
                     </button>
                   </div>
                   <button class="btn btn-outline btn-sm" onclick="goToQuestionFromSummary(${q.id})" style="margin-left:4px;">✏️ Edit</button>

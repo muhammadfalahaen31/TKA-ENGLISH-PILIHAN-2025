@@ -401,7 +401,7 @@ const QUESTIONS = [
     matrixHeaders: ["Statements", "Agree", "Disagree"],
     matrixRows: [
       { text: "The arguments presented in the text are not only logical but also persuasive as they are supported by data from a study.", answer: "Agree" },
-      { text: "The text presents reasonable arguments and may possibly convince readers aged 18â€“21 to use BNPL.", answer: "Disagree" },
+      { text: "The text presents reasonable arguments and may possibly convince readers aged 18"“21 to use BNPL.", answer: "Disagree" },
       { text: "The text has strong points about BNPL because the data are based on research.", answer: "Agree" }
     ],
     correctAnswer: ["Agree", "Disagree", "Agree"],
@@ -425,7 +425,7 @@ const QUESTIONS = [
     matrixHeaders: ["Situations", "Increased Stress", "Loss of Authenticity"],
     matrixRows: [
       { text: "Creating an idealized online persona that differs from one's real self.", answer: "Loss of Authenticity" },
-      { text: "Constantly comparing oneself to othersâ€™ seemingly perfect social media posts.", answer: "Increased Stress" },
+      { text: "Constantly comparing oneself to others' seemingly perfect social media posts.", answer: "Increased Stress" },
       { text: "Hiding one's true feelings on social media to avoid judgment.", answer: "Loss of Authenticity" }
     ],
     correctAnswer: ["Loss of Authenticity", "Increased Stress", "Loss of Authenticity"],
@@ -580,7 +580,7 @@ const QUESTIONS_11_20 = [
     hots: false,
     prompt: "People learn more easily from finfluencers and believe in them because the people ...",
     options: [
-      { id: "A", text: "enjoy finfluencersâ€™ short contents and think they have things in common." },
+      { id: "A", text: "enjoy finfluencers' short contents and think they have things in common." },
       { id: "B", text: "no longer believe in traditional advisors because they are out of date." },
       { id: "C", text: "anticipate a financial change which require guidance from finfluencers." },
       { id: "D", text: "are facing more complicated financial issues that are difficult to tackle." },
@@ -608,7 +608,7 @@ const QUESTIONS_11_20 = [
     prompt: "What extra evidence could strengthen the point made in the text?",
     options: [
       { id: "A", text: "Many social media channels invite finfluencers to their programme." },
-      { id: "B", text: "Finfluencersâ€™ contents used to get a little hype in social media." },
+      { id: "B", text: "Finfluencers contents used to get a little hype in social media." },
       { id: "C", text: "Most of the people remain think financial issues are negligible." },
       { id: "D", text: "Most audience are already well informed about personal finance." },
       { id: "E", text: "Current financial topics rarely become trending in social media." }
@@ -661,8 +661,8 @@ const QUESTIONS_11_20 = [
     hots: false,
     prompt: "What reasons does the writer give to support their main opinion?\nThere is more than one correct answer. Click on every correct answer.",
     options: [
-      { id: "A", text: "Finfluencersâ€™ content is easy-to-digest for their audience." },
-      { id: "B", text: "Finfluencersâ€™ openness will damage their trustworthiness." },
+      { id: "A", text: "Finfluencers content is easy-to-digest for their audience." },
+      { id: "B", text: "Finfluencers openness will damage their trustworthiness." },
       { id: "C", text: "Finfluencers protect people from making reckless financial choices." },
       { id: "D", text: "Finfluencers are those who study finance in higher education." },
       { id: "E", text: "Finfluencers broaden their audience by employing social media." }
@@ -691,7 +691,7 @@ const QUESTIONS_11_20 = [
     matrixRows: [
       { text: "They make financial lessons easier to understand for everyone.", answer: "SUITABLE" },
       { text: "Finfluencers mainly focus on warning people about risky investments.", answer: "UNSUITABLE" },
-      { text: "Finfluencersâ€™ openness builds trust and keeps followers informed.", answer: "SUITABLE" }
+      { text: "Finfluencers openness builds trust and keeps followers informed.", answer: "SUITABLE" }
     ],
     correctAnswer: ["SUITABLE", "UNSUITABLE", "SUITABLE"],
     explanation: "Pernyataan 1 dan 3 cocok (Suitable) dengan Paragraf 1 dan 3. Pernyataan 2 tidak cocok (Unsuitable) karena menggunakan pengubah ekstrem 'mainly focus' (hanya fokus memperingatkan bahaya), padahal finfluencer juga mengajar budgeting, saving, dan investing.",
@@ -853,7 +853,7 @@ const QUESTIONS_21_30 = [
     ],
     correctAnswer: "C",
     explanation: "Paragraf 3 secara eksplisit menyebutkan dampak lingkungan industri fast fashion, yaitu menyumbang sekitar 20% dari seluruh pencemaran air industri global.",
-    evidence: "The fashion industry is responsible for around 8â€“10% of global carbon emissions and about 20% of industrial water pollution.",
+    evidence: "The fashion industry is responsible for around 8"“10% of global carbon emissions and about 20% of industrial water pollution.",
     reasoning: "Soal memfilter dampak khusus terhadap LINGKUNGAN (environmental impact). Opsi C adalah dampak lingkungan nyata yang tercantum di Paragraf 3.",
     optionAnalysis: [
       { id: "A", status: "incorrect", text: "Salah. Keterjangkauan harga baju adalah aspek ekonomi/aksesibilitas, bukan dampak kerusakan lingkungan." },
@@ -875,12 +875,12 @@ const QUESTIONS_21_30 = [
       { id: "A", text: "The fashion industry is responsible for up to 10% of global carbon emissions." },
       { id: "B", text: "A circular economy involves customers reusing or recycling materials to reduce waste." },
       { id: "C", text: "Fast fashion clothes are created to be worn only a few times before being thrown away." },
-      { id: "D", text: "The use of biodegradable materials has reduced fast fashionâ€™s environmental impact." },
+      { id: "D", text: "The use of biodegradable materials has reduced fast fashion's environmental impact." },
       { id: "E", text: "Fast fashion became popular because it offers stylish and trendy clothes at low prices." }
     ],
     correctAnswer: ["A", "B", "C", "E"],
     explanation: "Pernyataan A, B, C, dan E merupakan fakta eksplisit Paragraf 1, 2, dan 3. Pernyataan D salah karena bahan yang digunakan fast fashion justru TIDAK dapat terurai secara alami (NOT biodegradable).",
-    evidence: "...responsible for around 8â€“10% of global carbon emissions... products are reused or recycled... wear them only a few times before discarding... NOT biodegradable...",
+    evidence: "...responsible for around 8"“10% of global carbon emissions... products are reused or recycled... wear them only a few times before discarding... NOT biodegradable...",
     reasoning: "Waspadai kata jebakan pada opsi D: Teks menyatakan bahan pakaian 'are NOT biodegradable', sehingga opsi D bernilai salah.",
     optionAnalysis: [
       { id: "A", status: "correct", text: "Benar. Teks Paragraf 3 secara eksplisit mencantumkan emisi karbon 8-10%." },
@@ -899,15 +899,15 @@ const QUESTIONS_21_30 = [
     hots: true,
     prompt: "The text discusses the phenomenon of fast fashion. Which of the following flowcharts best reflects the structure of the text?",
     options: [
-      { id: "A", text: "[Introduction to fast fashion and its appeal] âž” [Benefits for accessibility and early steps toward sustainability] âž” [Environmental consequences and overconsumption] âž” [Call for consumer awareness and systemic change]" },
-      { id: "B", text: "[Rise of fast fashion as a form of self-expression] âž” [Positive influence of online trends] âž” [Government bans on cheap clothing] âž” [Shift to secondhand as one of the solutions]" },
-      { id: "C", text: "[Economic growth driven by fast fashion] âž” [Brands' investment in recycling systems] âž” [Uncontrolled textile waste] âž” [Eco-fashion supported by government regulations]" },
-      { id: "D", text: "[Fast fashion's impact on small retailer] âž” [Fast fashion's impact on the economy] âž” [Fast fashion's impact on the environment] âž” [Fast fashion's impact on society]" },
-      { id: "E", text: "[Influencers' role in fashion trends] âž” [Emergence of the \"circular economy\"] âž” [Environmental impact of clothing production] âž” [Importance of educating consumers]" }
+      { id: "A", text: "Introduction to fast fashion and its appeal > Benefits for accessibility and early steps toward sustainability > Environmental consequences and overconsumption > Call for consumer awareness and systemic change" },
+      { id: "B", text: "Rise of fast fashion as a form of self-expression > Positive influence of online trends > Government bans on cheap clothing > Shift to secondhand as one of the solutions" },
+      { id: "C", text: "Economic growth driven by fast fashion > Brands' investment in recycling systems > Uncontrolled textile waste > Eco-fashion supported by government regulations" },
+      { id: "D", text: "Fast fashion's impact on small retailer > Fast fashion's impact on the economy > Fast fashion's impact on the environment > Fast fashion's impact on society" },
+      { id: "E", text: "Influencers' role in fashion trends > Emergence of the \"circular economy\" > Environmental impact of clothing production > Importance of educating consumers" }
     ],
     correctAnswer: "A",
-    explanation: "Diagram alir pada Opsi A secara sempurna mencerminkan alur wacana Teks 6 dari Paragraf 1 (Pengenalan & daya tarik) -> Paragraf 2 (Manfaat aksesibilitas & langkah awal sirkular) -> Paragraf 3 (Dampak buruk lingkungan & konsumsi berlebih) -> Paragraf 4 (Seruan kesadaran konsumen & perubahan sistemik).",
-    evidence: "Paragraf 1 (Intro) -> Paragraf 2 (Benefits/Accessibility) -> Paragraf 3 (Consequences) -> Paragraf 4 (Solutions/Systemic Change).",
+    explanation: "Diagram alir pada Opsi A secara sempurna mencerminkan alur wacana Teks 6 dari Paragraf 1 (Pengenalan & daya tarik) > Paragraf 2 (Manfaat aksesibilitas & langkah awal sirkular) > Paragraf 3 (Dampak buruk lingkungan & konsumsi berlebih) > Paragraf 4 (Seruan kesadaran konsumen & perubahan sistemik).",
+    evidence: "Paragraf 1 (Intro) > Paragraf 2 (Benefits/Accessibility) > Paragraf 3 (Consequences) > Paragraf 4 (Solutions/Systemic Change).",
     reasoning: "Opsi B, C, D, dan E memuat konsep yang tidak ada di teks (seperti larangan pemerintah, retailer kecil, atau peran influencer).",
     optionAnalysis: [
       { id: "A", status: "correct", text: "Benar. Mengikuti secara persis urutan paragraf wacana Teks 6 dari pengenalan hingga seruan perubahan." },
