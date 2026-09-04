@@ -1,10 +1,10 @@
 // ==========================================================================
 // LATIHAN TKA BAHASA INGGRIS SMA 2025 PILIHAN
-// STUDENT MODE JAVASCRIPT ENGINE (student.js v3.0)
-// 100% Offline, Touch-Safe, Mobile-First, SafeStorage & Self-Correction
+// STUDENT MODE JAVASCRIPT ENGINE (student.js v4.0)
+// 100% Offline, Touch-Safe, Mobile-First, Bulletproof Data Engine
 // ==========================================================================
 
-const STUDENT_STORAGE_KEY = 'tka_english_2025_pilihan_student_v3';
+const STUDENT_STORAGE_KEY = 'tka_english_2025_pilihan_student_v4';
 const THEME_KEY = 'tka_english_2025_theme';
 
 // SafeStorage Wrapper with in-memory fallback
@@ -44,30 +44,43 @@ const SafeStorage = {
 };
 window.SafeStorage = SafeStorage;
 
-// Safe Data Getters to guarantee zero crashes
+// Safe Global Data Getters
 function getMasterQuestions() {
+  if (typeof window !== 'undefined') {
+    if (Array.isArray(window.MASTER_QUESTIONS) && window.MASTER_QUESTIONS.length > 0) return window.MASTER_QUESTIONS;
+    if (Array.isArray(window.ALL_QUESTIONS) && window.ALL_QUESTIONS.length > 0) return window.ALL_QUESTIONS;
+    if (Array.isArray(window.QUESTIONS)) {
+      let list = [...window.QUESTIONS];
+      if (Array.isArray(window.QUESTIONS_11_20)) list.push(...window.QUESTIONS_11_20);
+      if (Array.isArray(window.QUESTIONS_21_30)) list.push(...window.QUESTIONS_21_30);
+      return list;
+    }
+  }
   if (typeof MASTER_QUESTIONS !== 'undefined' && Array.isArray(MASTER_QUESTIONS) && MASTER_QUESTIONS.length > 0) return MASTER_QUESTIONS;
   if (typeof ALL_QUESTIONS !== 'undefined' && Array.isArray(ALL_QUESTIONS) && ALL_QUESTIONS.length > 0) return ALL_QUESTIONS;
   if (typeof QUESTIONS !== 'undefined' && Array.isArray(QUESTIONS)) {
-    let q = [...QUESTIONS];
-    if (typeof QUESTIONS_11_20 !== 'undefined' && Array.isArray(QUESTIONS_11_20)) q.push(...QUESTIONS_11_20);
-    if (typeof QUESTIONS_21_30 !== 'undefined' && Array.isArray(QUESTIONS_21_30)) q.push(...QUESTIONS_21_30);
-    return q;
+    let list = [...QUESTIONS];
+    if (typeof QUESTIONS_11_20 !== 'undefined' && Array.isArray(QUESTIONS_11_20)) list.push(...QUESTIONS_11_20);
+    if (typeof QUESTIONS_21_30 !== 'undefined' && Array.isArray(QUESTIONS_21_30)) list.push(...QUESTIONS_21_30);
+    return list;
   }
   return [];
 }
 
 function getPassages() {
+  if (typeof window !== 'undefined' && Array.isArray(window.PASSAGES) && window.PASSAGES.length > 0) return window.PASSAGES;
   if (typeof PASSAGES !== 'undefined' && Array.isArray(PASSAGES) && PASSAGES.length > 0) return PASSAGES;
   return [];
 }
 
 function getVocabulary() {
+  if (typeof window !== 'undefined' && Array.isArray(window.VOCABULARY) && window.VOCABULARY.length > 0) return window.VOCABULARY;
   if (typeof VOCABULARY !== 'undefined' && Array.isArray(VOCABULARY) && VOCABULARY.length > 0) return VOCABULARY;
   return [];
 }
 
 function getStrategies() {
+  if (typeof window !== 'undefined' && Array.isArray(window.STRATEGIES) && window.STRATEGIES.length > 0) return window.STRATEGIES;
   if (typeof STRATEGIES !== 'undefined' && Array.isArray(STRATEGIES) && STRATEGIES.length > 0) return STRATEGIES;
   return [];
 }
@@ -112,18 +125,30 @@ const StudentState = {
 // INITIALIZATION
 // ==========================================
 function initStudentApp() {
-  loadStudentTheme();
-  loadStudentData();
-  setupStudentEvents();
-  renderStudentApp();
+  try {
+    loadStudentTheme();
+    loadStudentData();
+    setupStudentEvents();
+    renderStudentApp();
+  } catch (err) {
+    console.error('Error in initStudentApp:', err);
+  }
 }
 
-// Auto-run on all browsers safely
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initStudentApp);
 } else {
   initStudentApp();
 }
+
+// Second failover trigger after short delay
+setTimeout(() => {
+  const cards = document.getElementById('student-dashboard-cards');
+  if (cards && cards.children.length === 0) {
+    console.log('Failover re-rendering student app...');
+    renderStudentApp();
+  }
+}, 300);
 
 function loadStudentTheme() {
   const savedTheme = SafeStorage.getItem(THEME_KEY) || 'light';
@@ -155,14 +180,15 @@ function applyStudentTheme(theme) {
 function loadStudentData() {
   try {
     let raw = SafeStorage.getItem(STUDENT_STORAGE_KEY);
+    if (!raw) raw = SafeStorage.getItem('tka_english_2025_pilihan_student_v3');
     if (!raw) raw = SafeStorage.getItem('tka_english_2025_pilihan_student_v2');
     if (!raw) raw = SafeStorage.getItem('tka_english_2025_pilihan_student');
     
     if (raw) {
       const data = JSON.parse(raw);
       if (data.profile) StudentState.profile = { ...StudentState.profile, ...data.profile };
-      if (data.answers) StudentState.answers = data.answers;
-      if (data.evaluations) StudentState.evaluations = data.evaluations;
+      if (data.answers && typeof data.answers === 'object') StudentState.answers = data.answers;
+      if (data.evaluations && typeof data.evaluations === 'object') StudentState.evaluations = data.evaluations;
       if (typeof data.fontSizeLevel === 'number') StudentState.fontSizeLevel = data.fontSizeLevel;
       if (data.fontFamily) StudentState.fontFamily = data.fontFamily;
     }
@@ -170,7 +196,6 @@ function loadStudentData() {
     console.warn('Error loading student data from SafeStorage:', e);
   }
 
-  // Populate profile inputs if available
   const nameInput = document.getElementById('input-student-name');
   const classInput = document.getElementById('input-student-class');
   const schoolInput = document.getElementById('input-student-school');
@@ -214,13 +239,12 @@ function saveStudentProfile() {
 }
 
 function setupStudentEvents() {
-  // Safe listener for window resize
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
       const readPanel = document.getElementById('student-reading-panel');
       const quizPanel = document.getElementById('student-practice-panel');
-      if (readPanel) readPanel.style.display = '';
-      if (quizPanel) quizPanel.style.display = '';
+      if (readPanel) readPanel.style.display = 'block';
+      if (quizPanel) quizPanel.style.display = 'block';
     } else {
       setMobileViewTab(StudentState.mobileActiveTab || 'read');
     }
@@ -233,7 +257,6 @@ function setupStudentEvents() {
 function setStudentView(viewName) {
   StudentState.currentView = viewName;
 
-  // Update navbar active state
   document.querySelectorAll('.navbar .nav-item').forEach(item => {
     if (item.getAttribute('data-view') === viewName) {
       item.classList.add('active');
@@ -242,7 +265,6 @@ function setStudentView(viewName) {
     }
   });
 
-  // Update mobile bottom nav active state
   document.querySelectorAll('.mobile-bottom-nav .bottom-nav-item').forEach(item => {
     if (item.getAttribute('data-view') === viewName) {
       item.classList.add('active');
@@ -251,7 +273,6 @@ function setStudentView(viewName) {
     }
   });
 
-  // Show target section
   document.querySelectorAll('.main-view .view-section').forEach(sec => {
     sec.classList.remove('active');
   });
@@ -261,10 +282,8 @@ function setStudentView(viewName) {
     target.classList.add('active');
   }
 
-  // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Render specific view contents
   if (viewName === 'dashboard') {
     renderStudentDashboard();
   } else if (viewName === 'student_workspace') {
@@ -296,7 +315,7 @@ function renderStudentDashboard() {
 
   const reasonedCount = Object.keys(StudentState.answers).filter(qId => {
     const rec = StudentState.answers[qId];
-    return rec && rec.reason && rec.reason.trim().length > 3;
+    return rec && rec.reason && typeof rec.reason === 'string' && rec.reason.trim().length > 3;
   }).length;
 
   const totalQuestions = masterQ.length || 30;
@@ -310,7 +329,6 @@ function renderStudentDashboard() {
   if (elRsn) elRsn.textContent = `${reasonedCount}/${totalQuestions}`;
   if (elPrg) elPrg.textContent = `${progressPct}%`;
 
-  // Render Passages Grid
   const cardsContainer = document.getElementById('student-dashboard-cards');
   if (!cardsContainer) return;
 
@@ -344,12 +362,14 @@ function renderStudentDashboard() {
 }
 
 function openStudentWorkspace(textNumber) {
-  StudentState.selectedTextId = textNumber;
+  StudentState.selectedTextId = textNumber || 1;
   const masterQ = getMasterQuestions();
   const targetTextId = `text-${textNumber}`;
   const firstQIndex = masterQ.findIndex(q => q.textId === targetTextId);
   if (firstQIndex !== -1) {
     StudentState.currentQuestionIndex = firstQIndex;
+  } else {
+    StudentState.currentQuestionIndex = 0;
   }
   setStudentView('student_workspace');
 }
@@ -358,61 +378,74 @@ function openStudentWorkspace(textNumber) {
 // 2. STUDENT WORKSPACE VIEW
 // ==========================================
 function renderStudentWorkspace() {
-  const masterQ = getMasterQuestions();
-  const passages = getPassages();
+  try {
+    const masterQ = getMasterQuestions();
+    const passages = getPassages();
 
-  if (masterQ.length === 0) return;
+    if (masterQ.length === 0 || passages.length === 0) {
+      console.warn('Master questions or passages not loaded yet.');
+      return;
+    }
 
-  const currentQ = masterQ[StudentState.currentQuestionIndex] || masterQ[0];
-  if (!currentQ) return;
+    if (typeof StudentState.currentQuestionIndex !== 'number' || StudentState.currentQuestionIndex < 0 || StudentState.currentQuestionIndex >= masterQ.length) {
+      StudentState.currentQuestionIndex = 0;
+    }
 
-  const matchNum = currentQ.textId ? currentQ.textId.match(/\d+/) : null;
-  if (matchNum) {
-    StudentState.selectedTextId = parseInt(matchNum[0], 10);
-  }
+    const currentQ = masterQ[StudentState.currentQuestionIndex] || masterQ[0];
+    if (!currentQ) return;
 
-  const currentPassage = passages.find(p => p.id === currentQ.textId) || passages[0] || { number: 1, title: 'Reading Passage', text: '', source: '' };
+    const matchNum = currentQ.textId ? currentQ.textId.match(/\d+/) : null;
+    if (matchNum) {
+      StudentState.selectedTextId = parseInt(matchNum[0], 10);
+    } else {
+      StudentState.selectedTextId = 1;
+    }
 
-  // Title
-  const wsTitle = document.getElementById('student-ws-title');
-  if (wsTitle) {
-    wsTitle.textContent = `Text ${currentPassage.number}: ${currentPassage.title}`;
-  }
+    const currentPassage = passages.find(p => p.id === currentQ.textId) || passages[0];
 
-  // Reading Panel
-  const rTitle = document.getElementById('student-reading-title');
-  const rCitation = document.getElementById('student-reading-citation');
-  const rContent = document.getElementById('student-reading-content');
+    // Title
+    const wsTitle = document.getElementById('student-ws-title');
+    if (wsTitle && currentPassage) {
+      wsTitle.textContent = `Text ${currentPassage.number}: ${currentPassage.title}`;
+    }
 
-  if (rTitle) rTitle.textContent = currentPassage.title;
-  if (rCitation) rCitation.textContent = currentPassage.source || '';
-  if (rContent) {
-    const paragraphs = currentPassage.text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-    rContent.innerHTML = paragraphs.map((p, idx) => `
-      <div class="reading-paragraph">
-        <span class="p-number">${idx + 1}</span>
-        <span class="reading-text">${p.trim()}</span>
-      </div>
-    `).join('');
-  }
+    // Reading Panel
+    const rTitle = document.getElementById('student-reading-title');
+    const rCitation = document.getElementById('student-reading-citation');
+    const rContent = document.getElementById('student-reading-content');
 
-  // Question Navigator
-  renderStudentQNav();
+    if (rTitle && currentPassage) rTitle.textContent = currentPassage.title;
+    if (rCitation && currentPassage) rCitation.textContent = currentPassage.source || '';
+    if (rContent && currentPassage && currentPassage.text) {
+      const paragraphs = currentPassage.text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+      rContent.innerHTML = paragraphs.map((p, idx) => `
+        <div class="reading-paragraph">
+          <span class="p-number">${idx + 1}</span>
+          <span class="reading-text">${p.trim()}</span>
+        </div>
+      `).join('');
+    }
 
-  // Question Canvas
-  renderStudentPracticeCanvas(currentQ);
+    // Question Navigator
+    renderStudentQNav();
 
-  // Apply typography styles
-  applyStudentTypography();
+    // Question Canvas
+    renderStudentPracticeCanvas(currentQ);
 
-  // Apply mobile panel view if screen <= 768px
-  if (window.innerWidth <= 768) {
-    setMobileViewTab(StudentState.mobileActiveTab || 'read');
-  } else {
-    const readPanel = document.getElementById('student-reading-panel');
-    const quizPanel = document.getElementById('student-practice-panel');
-    if (readPanel) readPanel.style.display = 'block';
-    if (quizPanel) quizPanel.style.display = 'block';
+    // Apply typography styles
+    applyStudentTypography();
+
+    // Apply mobile panel view if screen <= 768px
+    if (window.innerWidth <= 768) {
+      setMobileViewTab(StudentState.mobileActiveTab || 'read');
+    } else {
+      const readPanel = document.getElementById('student-reading-panel');
+      const quizPanel = document.getElementById('student-practice-panel');
+      if (readPanel) readPanel.style.display = 'block';
+      if (quizPanel) quizPanel.style.display = 'block';
+    }
+  } catch (err) {
+    console.error('Error in renderStudentWorkspace:', err);
   }
 }
 
@@ -449,12 +482,12 @@ function renderStudentQNav() {
 
 function renderStudentPracticeCanvas(q) {
   const canvas = document.getElementById('student-practice-canvas');
-  if (!canvas) return;
+  if (!canvas || !q) return;
 
   const masterQ = getMasterQuestions();
   const currentAnswerObj = StudentState.answers[q.id] || { answer: null, reason: '' };
-  const studentAns = currentAnswerObj.answer;
-  const studentReason = currentAnswerObj.reason || '';
+  const studentAns = (currentAnswerObj && currentAnswerObj.answer !== undefined) ? currentAnswerObj.answer : null;
+  const studentReason = (currentAnswerObj && typeof currentAnswerObj.reason === 'string') ? currentAnswerObj.reason : '';
 
   let interactionHtml = '';
 
@@ -464,7 +497,7 @@ function renderStudentPracticeCanvas(q) {
     interactionHtml = `
       <div class="options-list">
         ${options.map(opt => {
-          const isChecked = studentAns === opt.id;
+          const isChecked = typeof studentAns === 'string' && studentAns === opt.id;
           return `
             <label class="option-card ${isChecked ? 'selected' : ''}" onclick="selectStudentSingleAnswer(${q.id}, '${opt.id}')">
               <span class="opt-radio-circle">${isChecked ? '✓' : opt.id}</span>
@@ -478,7 +511,7 @@ function renderStudentPracticeCanvas(q) {
   // TYPE 2: MULTIPLE RESPONSE (Multiple Answers)
   else if (q.type === 'mcma') {
     const options = q.options || [];
-    const selectedArr = Array.isArray(studentAns) ? studentAns : [];
+    const selectedArr = Array.isArray(studentAns) ? studentAns : (typeof studentAns === 'string' && studentAns ? [studentAns] : []);
     interactionHtml = `
       <div class="options-list">
         ${options.map(opt => {
@@ -497,7 +530,7 @@ function renderStudentPracticeCanvas(q) {
   else if (q.type === 'matrix') {
     const headers = q.matrixHeaders || ['Statement', 'True', 'False'];
     const rows = q.matrixRows || [];
-    const matrixAns = Array.isArray(studentAns) ? studentAns : new Array(rows.length).fill(null);
+    const matrixAns = Array.isArray(studentAns) ? studentAns : [];
 
     interactionHtml = `
       <div style="overflow-x:auto;">
@@ -596,7 +629,6 @@ function formatStudentQType(type) {
   return 'Multiple Choice';
 }
 
-// Option selection handlers
 function selectStudentSingleAnswer(qId, optId) {
   if (!StudentState.answers[qId]) {
     StudentState.answers[qId] = { answer: optId, reason: '', timestamp: Date.now() };
@@ -613,7 +645,7 @@ function toggleStudentMultiAnswer(qId, optId) {
   if (!StudentState.answers[qId]) {
     StudentState.answers[qId] = { answer: [optId], reason: '', timestamp: Date.now() };
   } else {
-    let arr = Array.isArray(StudentState.answers[qId].answer) ? [...StudentState.answers[qId].answer] : [];
+    let arr = Array.isArray(StudentState.answers[qId].answer) ? [...StudentState.answers[qId].answer] : (typeof StudentState.answers[qId].answer === 'string' && StudentState.answers[qId].answer ? [StudentState.answers[qId].answer] : []);
     if (arr.includes(optId)) {
       arr = arr.filter(item => item !== optId);
     } else {
@@ -672,7 +704,6 @@ function nextStudentQuestion() {
   }
 }
 
-// Mobile Tab switcher: read vs quiz
 function setMobileViewTab(tab) {
   StudentState.mobileActiveTab = tab;
   const btnRead = document.getElementById('btn-mobile-read');
@@ -698,7 +729,6 @@ function setMobileViewTab(tab) {
   }
 }
 
-// Typography Controls
 function changeStudentFontSize(delta) {
   if (delta === 0) {
     StudentState.fontSizeLevel = 0;
@@ -736,7 +766,6 @@ function applyStudentTypography() {
   }
 }
 
-// Floating Peek Passage Bottom Sheet
 function openPeekModal() {
   const masterQ = getMasterQuestions();
   const passages = getPassages();
@@ -748,8 +777,8 @@ function openPeekModal() {
   const body = document.getElementById('peek-sheet-body');
   const overlay = document.getElementById('peek-sheet-overlay');
 
-  if (title) title.textContent = `Text ${pass.number}: ${pass.title}`;
-  if (body) {
+  if (title && pass) title.textContent = `Text ${pass.number}: ${pass.title}`;
+  if (body && pass && pass.text) {
     const paragraphs = pass.text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
     body.innerHTML = paragraphs.map((p, idx) => `
       <div class="reading-paragraph" style="margin-bottom:14px;">
@@ -778,7 +807,6 @@ function renderStudentVocabLab() {
   const currentFilter = StudentState.vocabFilter;
   const currentMode = StudentState.vocabActivity;
 
-  // Filter Vocabulary List
   let filteredVocab = [...vocabulary];
   if (currentFilter !== 'all') {
     const targetTextId = `text-${currentFilter}`;
@@ -829,7 +857,6 @@ function setStudentVocabActivity(mode) {
   renderStudentVocabLab();
 }
 
-// Mode 1: 3D Flip Cards
 function renderVocabFlipCards(container, list) {
   if (list.length === 0) {
     container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">No vocabulary found for this filter.</div>`;
@@ -846,8 +873,6 @@ function renderVocabFlipCards(container, list) {
       ${list.map(v => `
         <div class="flip-card-wrapper">
           <div class="flip-card-inner" onclick="toggleCardFlip(this)">
-            
-            <!-- FRONT CARD -->
             <div class="flip-card-front">
               <div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -859,7 +884,6 @@ function renderVocabFlipCards(container, list) {
                 <h3 class="flip-card-word">${v.word}</h3>
                 <div class="flip-card-phonetic">${v.phonetic || ''}</div>
               </div>
-
               <div>
                 <div class="flip-hint-badge">
                   💡 Tap to Flip Meaning & Context ↻
@@ -867,7 +891,6 @@ function renderVocabFlipCards(container, list) {
               </div>
             </div>
 
-            <!-- BACK CARD -->
             <div class="flip-card-back">
               <div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -886,13 +909,11 @@ function renderVocabFlipCards(container, list) {
                   "${v.sentence || ''}"
                 </div>
               </div>
-
               <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-muted);">
                 <span>📌 ${v.relatedQuestion || 'Text Reference'}</span>
                 <span style="font-weight:700; color:var(--academic-blue);">Tap to Flip Back ↻</span>
               </div>
             </div>
-
           </div>
         </div>
       `).join('')}
@@ -904,7 +925,6 @@ function toggleCardFlip(el) {
   el.classList.toggle('flipped');
 }
 
-// Mode 2: Match Words Game
 function renderVocabMatchingGame(container, list) {
   const sample = [...list].sort(() => 0.5 - Math.random()).slice(0, 6);
   if (sample.length < 3) {
@@ -932,7 +952,6 @@ function renderVocabMatchingGame(container, list) {
       </div>
 
       <div class="matching-grid-container" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
-        <!-- Left column -->
         <div id="matching-left-col" style="display:flex; flex-direction:column; gap:12px;">
           ${leftItems.map(item => `
             <div class="match-card match-left" data-id="${item.id}" onclick="handleMatchSelect('left', ${item.id})" style="background:var(--bg-card-alt); padding:14px 18px; border-radius:12px; border:1.5px solid var(--border-color); font-weight:800; font-size:1rem; cursor:pointer; transition:all 0.2s ease;">
@@ -941,7 +960,6 @@ function renderVocabMatchingGame(container, list) {
           `).join('')}
         </div>
 
-        <!-- Right column -->
         <div id="matching-right-col" style="display:flex; flex-direction:column; gap:12px;">
           ${rightItems.map(item => `
             <div class="match-card match-right" data-id="${item.id}" onclick="handleMatchSelect('right', ${item.id})" style="background:var(--bg-card-alt); padding:14px 18px; border-radius:12px; border:1.5px solid var(--border-color); font-weight:600; font-size:0.92rem; cursor:pointer; line-height:1.4; transition:all 0.2s ease;">
@@ -1022,7 +1040,6 @@ function handleMatchSelect(col, id) {
   }
 }
 
-// Mode 3: Context Challenge
 function renderVocabContextChallenge(container, list) {
   if (list.length < 4) {
     container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">Need more terms for context quiz. Please select 'All Passages'.</div>`;
@@ -1101,7 +1118,6 @@ function handleContextQuizSelect(selectedId, targetId) {
   renderCurrentContextQuizStep(container);
 }
 
-// Mode 4: Searchable Word Master Table
 function renderVocabMasterTable(container, list) {
   container.innerHTML = `
     <div style="background:var(--bg-card); border-radius:16px; padding:24px; border:1px solid var(--border-color); margin-top:16px;">
@@ -1249,7 +1265,7 @@ function renderStudentSummary() {
 
   const reasoned = Object.keys(StudentState.answers).filter(qId => {
     const rec = StudentState.answers[qId];
-    return rec && rec.reason && rec.reason.trim().length > 3;
+    return rec && rec.reason && typeof rec.reason === 'string' && rec.reason.trim().length > 3;
   }).length;
 
   const evals = StudentState.evaluations || {};
@@ -1259,7 +1275,6 @@ function renderStudentSummary() {
   const scorePercent = evaluatedCount > 0 ? Math.round((correctCount / total) * 100) : 0;
 
   container.innerHTML = `
-    <!-- Summary Header Card -->
     <div style="background:var(--bg-card); border-radius:16px; padding:26px; border:1px solid var(--border-color); margin-bottom:24px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
         <div>
@@ -1275,7 +1290,6 @@ function renderStudentSummary() {
         </div>
       </div>
 
-      <!-- Student Profile Badge Box -->
       <div class="summary-profile-box" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; background:var(--bg-card-alt); padding:18px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
         <div><strong>Student Name:</strong> <span style="color:var(--academic-blue); font-weight:800;">${StudentState.profile.name || '(Not Filled)'}</span></div>
         <div><strong>Class / Group:</strong> <span style="color:var(--academic-blue); font-weight:800;">${StudentState.profile.class || '(Not Filled)'}</span></div>
@@ -1283,7 +1297,6 @@ function renderStudentSummary() {
         <div><strong>Advisor / Teacher:</strong> <span>${StudentState.profile.teacher || 'Muhammad Falahaen Jiddan, M.Pd. Gr.'}</span></div>
       </div>
 
-      <!-- Live Self-Evaluation Scoreboard -->
       <div class="eval-score-card">
         <div>
           <div style="font-size:0.85rem; color:#94a3b8; font-weight:800; text-transform:uppercase;">Self-Correction Score:</div>
@@ -1306,7 +1319,6 @@ function renderStudentSummary() {
       </div>
     </div>
 
-    <!-- Questions Detailed List -->
     <div style="background:var(--bg-card); border-radius:16px; padding:24px; border:1px solid var(--border-color);">
       <h3 style="font-size:1.3rem; font-weight:900; color:var(--text-main); margin-bottom:18px;">
         📝 Detailed Question-by-Question Worksheet & Self-Correction:
@@ -1404,9 +1416,6 @@ function printStudentWorksheet() {
   window.print();
 }
 
-// ==========================================
-// RESET MODAL
-// ==========================================
 function openStudentResetModal() {
   const modal = document.getElementById('student-reset-modal');
   if (modal) modal.classList.add('open');
@@ -1426,9 +1435,6 @@ function confirmStudentReset() {
   renderStudentApp();
 }
 
-// ==========================================
-// TOAST NOTIFICATION
-// ==========================================
 function showStudentToast(msg) {
   const container = document.getElementById('toast-container');
   if (!container) return;
