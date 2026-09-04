@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LATIHAN TKA BAHASA INGGRIS SMA 2025 PILIHAN — Student Worksheet & Reasoning</title>
+  <meta name="description" content="Latihan TKA Bahasa Inggris SMA 2025 Pilihan: 30 Soal HOTS Interaktif, Lembar Penalaran Kritis Siswa, Vocab Lab 90 Kata, & Panduan Strategi.">
+  
+  <!-- Google Fonts: Inter & Merriweather -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- ==========================================
+         TOP NAVIGATION BAR
+    ========================================== -->
+    <header class="navbar">
+      <div class="nav-brand" onclick="setStudentView('dashboard')">
+        <span class="student-badge">TKA 2025</span>
+        <span class="brand-title">Pilihan Bahasa Inggris</span>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item active" data-view="dashboard" onclick="setStudentView('dashboard')">📊 Dashboard</li>
+          <li class="nav-item" data-view="student_workspace" onclick="setStudentView('student_workspace')">✍️ Worksheet</li>
+          <li class="nav-item" data-view="vocab_lab" onclick="setStudentView('vocab_lab')">📚 Vocab Lab</li>
+          <li class="nav-item" data-view="tka_strategy" onclick="setStudentView('tka_strategy')">🎯 Strategy Guide</li>
+          <li class="nav-item" data-view="worksheet_summary" onclick="setStudentView('worksheet_summary')">📋 My Answer Sheet</li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn-theme-toggle" id="theme-toggle" onclick="toggleStudentTheme()">
+          <span id="theme-icon">🌙</span> <span id="theme-label">Dark</span>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="openStudentResetModal()">🔄 Reset</button>
+      </div>
+    </header>
+
+    <!-- ==========================================
+         MAIN VIEWS
+    ========================================== -->
+    <main class="main-view">
+
+      <!-- 1. STUDENT DASHBOARD VIEW -->
+      <section id="view-dashboard" class="view-section active">
+        
+        <!-- Student Identity Form Card -->
+        <div class="student-id-card">
+          <div class="student-input-group">
+            <label class="student-input-label">Student Full Name:</label>
+            <input type="text" id="input-student-name" class="student-input-field" placeholder="Type your full name..." onchange="saveStudentProfile()">
+          </div>
+          <div class="student-input-group">
+            <label class="student-input-label">Class / Group:</label>
+            <input type="text" id="input-student-class" class="student-input-field" placeholder="e.g., XII-1 / Group A..." onchange="saveStudentProfile()">
+          </div>
+          <div class="student-input-group">
+            <label class="student-input-label">School / Institution:</label>
+            <input type="text" id="input-student-school" class="student-input-field" value="SMA Plus PGRI Cibinong" onchange="saveStudentProfile()">
+          </div>
+          <div class="student-input-group">
+            <label class="student-input-label">Teacher / Advisor:</label>
+            <input type="text" id="input-student-teacher" class="student-input-field" value="Muhammad Falahaen Jiddan, M.Pd. Gr." onchange="saveStudentProfile()">
+          </div>
+        </div>
+
+        <!-- Student Hero Banner -->
+        <div class="dashboard-hero-banner" style="background: linear-gradient(135deg, #0284c7, #0f172a);">
+          <div>
+            <span class="badge badge-amber" style="margin-bottom: 8px;">INTERACTIVE WORKSHEET & CRITICAL REASONING</span>
+            <div class="dash-banner-title">LATIHAN TKA BAHASA INGGRIS SMA 2025 PILIHAN</div>
+            <p class="dash-banner-subtitle">
+              Select a reading passage to practice authentic TKA questions. <strong>Write your textual evidence and logical reasoning</strong> for every question to develop higher-order thinking skills (HOTS).
+            </p>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-lg" style="background: white; color: #0284c7; font-weight: 800;" onclick="openStudentWorkspace(1)">
+              🚀 Start / Resume Worksheet →
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Hub Cards -->
+        <div class="dash-hub-grid">
+          <div class="dash-hub-card" onclick="setStudentView('vocab_lab')">
+            <div class="hub-card-left">
+              <div class="hub-icon-box" style="background: #e0f2fe; color: #0284c7;">📚</div>
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">Vocabulary Lab</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">90 High-Yield Terms (15 per text), Audio Pronunciation, 3D Flip Cards & Matching Game.</p>
+              </div>
+            </div>
+            <span class="btn btn-outline btn-sm">Open Lab →</span>
+          </div>
+
+          <div class="dash-hub-card" onclick="setStudentView('tka_strategy')">
+            <div class="hub-card-left">
+              <div class="hub-icon-box" style="background: var(--accent-amber-light); color: var(--accent-amber);">🎯</div>
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">TKA Strategy Guide</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">6 Core HOTS Reading Strategies & systematic step-by-step methods.</p>
+              </div>
+            </div>
+            <span class="btn btn-outline btn-sm">Open Strategy →</span>
+          </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="overview-stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">📝</div>
+            <div>
+              <div class="stat-val" id="student-stat-answered">0/30</div>
+              <div class="stat-label">Questions Answered</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: var(--accent-cyan-light); color: var(--academic-blue);">✍️</div>
+            <div>
+              <div class="stat-val" id="student-stat-reasoned">0/30</div>
+              <div class="stat-label">Reasoning Provided</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: var(--accent-purple-light); color: var(--accent-purple);">📊</div>
+            <div>
+              <div class="stat-val" id="student-stat-progress">0%</div>
+              <div class="stat-label">Overall Progress</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #dcfce7; color: #059669;">📖</div>
+            <div>
+              <div class="stat-val">6 Texts</div>
+              <div class="stat-label">Authentic Passages</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 Text Cards Grid -->
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--text-main); margin: 24px 0 16px 0;">📚 Reading Passages & Practice Exercises:</h3>
+        <div class="text-cards-grid" id="student-dashboard-cards"></div>
+      </section>
+
+      <!-- 2. STUDENT WORKSPACE -->
+      <section id="view-student_workspace" class="view-section">
+        
+        <!-- Top Toolbar -->
+        <div class="workspace-top-bar">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="setStudentView('dashboard')">← Dashboard</button>
+            <div id="student-ws-title" style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);"></div>
+          </div>
+
+          <div class="font-size-control-group">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-right: 4px;">Typography:</span>
+            <button class="btn-font-ctrl" onclick="changeStudentFontSize(-1)">A-</button>
+            <button class="btn-font-ctrl" onclick="changeStudentFontSize(0)">Default</button>
+            <button class="btn-font-ctrl" onclick="changeStudentFontSize(1)">A+</button>
+            <button class="btn-font-ctrl" onclick="toggleStudentFontFamily()" style="margin-left: 6px;">Font: <span id="student-font-label">Serif</span></button>
+          </div>
+        </div>
+
+        <!-- Mobile View Toggle -->
+        <div class="mobile-tab-switch">
+          <button class="mobile-switch-btn active" id="btn-mobile-read" onclick="setMobileViewTab('read')">📖 1. Read Passage</button>
+          <button class="mobile-switch-btn" id="btn-mobile-quiz" onclick="setMobileViewTab('quiz')">✍️ 2. Questions & Reasons</button>
+        </div>
+
+        <!-- Split Grid Workspace -->
+        <div class="workspace-split-container">
+          
+          <!-- LEFT PANEL: READING TEXT -->
+          <div class="workspace-left-panel" id="student-reading-panel">
+            <h2 class="reading-article-title" id="student-reading-title"></h2>
+            <div class="reading-citation" id="student-reading-citation"></div>
+            <div id="student-reading-content"></div>
+          </div>
+
+          <!-- RIGHT PANEL: QUESTIONS & REASONING -->
+          <div class="workspace-right-panel" id="student-practice-panel">
+            <div class="practice-header-bar">
+              <span style="font-weight: 800; color: var(--text-main); font-size: 1.05rem;">Select Question Number:</span>
+              <div class="practice-q-nav" id="student-practice-q-nav"></div>
+            </div>
+
+            <div id="student-practice-canvas"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 3. VOCABULARY LAB (STUDENT VIEW) -->
+      <section id="view-vocab_lab" class="view-section">
+        <div class="global-vocab-container">
+          <div style="background: var(--bg-card); padding: 24px 30px; border-radius: 14px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <h2 style="font-size: 1.6rem; font-weight: 900; color: var(--text-main); margin-bottom: 4px;">📚 Vocabulary & Concept Lab</h2>
+              <p style="font-size: 0.95rem; color: var(--text-muted);">90 High-Yield Specialized Terms (15 per Text): 3D Flip Cards, Match Words Game, Context Quiz, and Live Search Master Table.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="setStudentView('dashboard')">← Dashboard</button>
+          </div>
+
+          <!-- Text Filter -->
+          <div class="vocab-filter-pills">
+            <button class="vocab-filter-pill active" data-textfilter="all" onclick="filterStudentVocab('all')">All Passages (90 Words)</button>
+            <button class="vocab-filter-pill" data-textfilter="1" onclick="filterStudentVocab(1)">Text 1: Online & Offline (15)</button>
+            <button class="vocab-filter-pill" data-textfilter="2" onclick="filterStudentVocab(2)">Text 2: BNPL Impact (15)</button>
+            <button class="vocab-filter-pill" data-textfilter="3" onclick="filterStudentVocab(3)">Text 3: Electric Vehicles (15)</button>
+            <button class="vocab-filter-pill" data-textfilter="4" onclick="filterStudentVocab(4)">Text 4: Finfluencers (15)</button>
+            <button class="vocab-filter-pill" data-textfilter="5" onclick="filterStudentVocab(5)">Text 5: Vertical Garden (15)</button>
+            <button class="vocab-filter-pill" data-textfilter="6" onclick="filterStudentVocab(6)">Text 6: Fast Fashion (15)</button>
+          </div>
+
+          <!-- Activity Nav -->
+          <div class="vocab-activity-nav">
+            <button class="vocab-mode-btn active" data-mode="flipcard" onclick="setStudentVocabActivity('flipcard')">🎴 1. 3D Flip Cards</button>
+            <button class="vocab-mode-btn" data-mode="matching" onclick="setStudentVocabActivity('matching')">🧩 2. Match Words Game</button>
+            <button class="vocab-mode-btn" data-mode="context" onclick="setStudentVocabActivity('context')">💡 3. Context Challenge</button>
+            <button class="vocab-mode-btn" data-mode="list" onclick="setStudentVocabActivity('list')">📋 4. Word Master Table</button>
+          </div>
+
+          <div id="student-vocab-content-area"></div>
+        </div>
+      </section>
+
+      <!-- 4. TKA STRATEGY (STUDENT VIEW) -->
+      <section id="view-tka_strategy" class="view-section">
+        <div class="strategy-container">
+          <div style="background: var(--bg-card); padding: 24px 30px; border-radius: 14px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <h2 style="font-size: 1.6rem; font-weight: 900; color: var(--text-main); margin-bottom: 4px;">🎯 TKA Strategy Guide (HOTS Reading Formulas)</h2>
+              <p style="font-size: 0.95rem; color: var(--text-muted);">6 Core Reading Comprehension Strategies, Systematic Steps, and Trap Analysis.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="setStudentView('dashboard')">← Dashboard</button>
+          </div>
+
+          <div class="strategy-grid" id="student-strategy-cards-container"></div>
+        </div>
+      </section>
+
+      <!-- 5. WORKSHEET SUMMARY & CHECK (STUDENT VIEW) -->
+      <section id="view-worksheet_summary" class="view-section">
+        <div id="student-summary-container"></div>
+      </section>
+
+    </main>
+
+    <!-- ==========================================
+         FIXED BOTTOM NAVIGATION BAR (TOUCH UI FOR HP)
+    ========================================== -->
+    <nav class="mobile-bottom-nav">
+      <div class="bottom-nav-item active" data-view="dashboard" onclick="setStudentView('dashboard')">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </div>
+      <div class="bottom-nav-item" data-view="student_workspace" onclick="setStudentView('student_workspace')">
+        <span class="nav-icon">✍️</span>
+        <span>Worksheet</span>
+      </div>
+      <div class="bottom-nav-item" data-view="vocab_lab" onclick="setStudentView('vocab_lab')">
+        <span class="nav-icon">📚</span>
+        <span>Vocab Lab</span>
+      </div>
+      <div class="bottom-nav-item" data-view="tka_strategy" onclick="setStudentView('tka_strategy')">
+        <span class="nav-icon">🎯</span>
+        <span>Strategy</span>
+      </div>
+      <div class="bottom-nav-item" data-view="worksheet_summary" onclick="setStudentView('worksheet_summary')">
+        <span class="nav-icon">📋</span>
+        <span>Answer Sheet</span>
+      </div>
+    </nav>
+
+    <!-- Floating Action Button for Peek Passage on Mobile -->
+    <button class="btn-floating-peek" onclick="openPeekModal()" title="Peek Reading Passage">
+      <span>👀 Peek Passage</span>
+    </button>
+
+    <!-- Bottom Sheet Modal Drawer for Peek Passage -->
+    <div class="bottom-sheet-overlay" id="peek-sheet-overlay">
+      <div class="bottom-sheet-drawer">
+        <div class="bottom-sheet-header">
+          <h3 id="peek-sheet-title" style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);"></h3>
+          <button class="btn btn-secondary btn-sm" onclick="closePeekModal()">✕ Close</button>
+        </div>
+        <div class="bottom-sheet-body" id="peek-sheet-body"></div>
+      </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal-overlay" id="student-reset-modal">
+      <div class="modal-content">
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--accent-red); margin-bottom: 12px;">⚠️ Reset Worksheet?</h3>
+        <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6;">
+          This action will permanently clear all your selected answers and written reasoning. Are you sure you want to reset?
+        </p>
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button class="btn btn-secondary" onclick="closeStudentModal('student-reset-modal')">Cancel</button>
+          <button class="btn btn-danger" onclick="confirmStudentReset()">Yes, Reset Worksheet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container"></div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="student.js"></script>
+</body>
+</html>

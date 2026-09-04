@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TKA Bahasa Inggris 2025 — Interactive Learning & Practice Media</title>
+  <meta name="description" content="Media Pembelajaran Interaktif TKA Bahasa Inggris 2025 SMA/MA/SMK berbasis Soal Asli, Strategi HOTS, Bedah Vocabulary, dan Game Interaktif.">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-title">
+        <h1>TKA BAHASA INGGRIS 2025</h1>
+        <p>Interactive Learning & Practice Media • SMA/MA/SMK</p>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab-btn active" data-tab="tab-home">
+        <span>🏠</span> HOME
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-strategies">
+        <span>🎯</span> STRATEGIES
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-questions">
+        <span>📝</span> TKA QUESTIONS
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-vocabulary">
+        <span>📚</span> VOCABULARY
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-game">
+        <span>🎮</span> VOCAB GAME
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="app-container">
+
+    <!-- TAB 0: HOME / HERO LANDING -->
+    <section id="tab-home" class="tab-content active">
+      <div class="hero-card">
+        <h2 class="hero-title">MASTERING TKA BAHASA INGGRIS 2025</h2>
+        <p class="hero-subtitle">
+          Practice authentic TKA English questions, learn effective test-taking strategies, master important vocabulary from reading texts, and test your skills in the Interactive Vocab Game!
+        </p>
+        <div class="hero-actions">
+          <button class="btn-hero btn-primary" onclick="switchTab('tab-questions')">
+            📝 START TKA QUESTIONS
+          </button>
+          <button class="btn-hero btn-secondary" onclick="switchTab('tab-game'); startVocabGame();">
+            🎮 PLAY VOCAB GAME
+          </button>
+          <button class="btn-hero btn-secondary" onclick="switchTab('tab-strategies')">
+            🎯 LEARN STRATEGIES
+          </button>
+          <button class="btn-hero btn-secondary" onclick="switchTab('tab-vocabulary')">
+            📚 BROWSE VOCABULARY
+          </button>
+        </div>
+      </div>
+
+      <!-- HIGHLIGHT FEATURES -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; margin-top:2rem;">
+        <div style="background:var(--bg-surface); padding:1.5rem; border-radius:16px; border:1px solid var(--border-color);">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">🎯</div>
+          <h3 style="font-size:1.3rem; color:#fff; margin-bottom:0.5rem;">Relevant Test Strategies</h3>
+          <p style="color:var(--text-secondary);">Master 6 key HOTS reading strategies tailored specifically to the official TKA 2025 question types.</p>
+        </div>
+
+        <div style="background:var(--bg-surface); padding:1.5rem; border-radius:16px; border:1px solid var(--border-color);">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">📝</div>
+          <h3 style="font-size:1.3rem; color:#fff; margin-bottom:0.5rem;">30 Authentic Questions</h3>
+          <p style="color:var(--text-secondary);">Practice all 30 official questions with instant feedback, text evidence, reasoning, and detailed option analysis.</p>
+        </div>
+
+        <div style="background:var(--bg-surface); padding:1.5rem; border-radius:16px; border:1px solid var(--border-color);">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">📚</div>
+          <h3 style="font-size:1.3rem; color:#fff; margin-bottom:0.5rem;">43 Essential Terms</h3>
+          <p style="color:var(--text-secondary);">Explore contextual definitions, simple meanings, and question links for 43 high-yield vocabulary items.</p>
+        </div>
+
+        <div style="background:var(--bg-surface); padding:1.5rem; border-radius:16px; border:1px solid var(--border-color);">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">🎮</div>
+          <h3 style="font-size:1.3rem; color:#fff; margin-bottom:0.5rem;">10 Vocab Challenge Game</h3>
+          <p style="color:var(--text-secondary);">Interactive 10-Question Gamified Challenge with streak multipliers, immediate feedback, and score leaderboard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: STRATEGIES -->
+    <section id="tab-strategies" class="tab-content">
+      <div style="margin-bottom:1.5rem;">
+        <h2 style="font-size:2rem; font-weight:800; color:#fff;">🎯 TEST-TAKING STRATEGIES</h2>
+        <p style="color:var(--text-secondary);">Master effective techniques designed specifically for TKA Bahasa Inggris 2025 reading comprehension.</p>
+      </div>
+
+      <div id="strategies-container" class="strategies-grid">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+
+    <!-- TAB 2: TKA QUESTIONS WORKSPACE -->
+    <section id="tab-questions" class="tab-content">
+      <div class="tka-workspace">
+        
+        <!-- LEFT: READING PANEL -->
+        <aside class="reading-panel">
+          <div class="passage-header">
+            <span id="passage-tag" class="passage-tag">READING TEXT 1</span>
+            <h2 id="passage-title" class="passage-title">Balancing Our Online and Offline Selves</h2>
+          </div>
+          <div id="passage-body" class="passage-body">
+            <!-- Rendered by app.js -->
+          </div>
+          <div id="passage-source" class="passage-source">
+            <!-- Source link rendered by app.js -->
+          </div>
+        </aside>
+
+        <!-- RIGHT: QUESTION PANEL -->
+        <div class="question-panel">
+          
+          <!-- PROGRESS BAR -->
+          <div class="progress-bar-container">
+            <div id="progress-text" class="progress-text">Question 1 of 30 (3%)</div>
+            <div class="progress-track">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+          </div>
+
+          <!-- QUESTION META & BADGES -->
+          <div class="question-meta">
+            <span id="q-num-badge" class="q-num-badge">QUESTION 01</span>
+            <span id="q-type-badge" class="q-type-badge">Multiple Choice</span>
+            <span id="q-hots-badge" class="q-hots-badge">HOTS ANALYSIS</span>
+          </div>
+
+          <!-- QUESTION PROMPT -->
+          <div id="q-prompt" class="question-prompt">
+            <!-- Question text rendered by app.js -->
+          </div>
+
+          <!-- INTERACTION AREA -->
+          <div id="interaction-area">
+            <!-- Rendered by app.js (MC, MCMA, or Matrix Grid) -->
+          </div>
+
+          <!-- SUBMIT BUTTON -->
+          <button id="btn-submit-answer" class="btn-submit-answer" onclick="submitCurrentAnswer()">
+            SUBMIT ANSWER
+          </button>
+
+          <!-- FEEDBACK CONTAINER -->
+          <div id="feedback-container">
+            <!-- Feedback rendered by app.js after submit -->
+          </div>
+
+          <!-- QUESTION CONTROLS -->
+          <div class="q-controls">
+            <div class="q-nav-buttons">
+              <button id="btn-prev-q" class="btn-q-nav" onclick="prevQuestion()">◄ Previous</button>
+              <button id="btn-next-q" class="btn-q-nav" onclick="nextQuestion()">Next ►</button>
+            </div>
+            <button class="btn-hero btn-secondary" style="font-size:0.95rem; padding:0.6rem 1.2rem;" onclick="finishPractice()">
+              📊 View Final Result
+            </button>
+          </div>
+
+          <!-- QUESTION NAVIGATOR GRID -->
+          <div class="question-navigator">
+            <div class="nav-grid-title">QUESTION NAVIGATOR (Jump to Question):</div>
+            <div id="nav-grid-container" class="nav-grid">
+              <!-- Grid buttons rendered by app.js -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: VOCABULARY -->
+    <section id="tab-vocabulary" class="tab-content">
+      <div class="vocab-workspace">
+        <div style="margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h2 style="font-size:2rem; font-weight:800; color:#fff;">📚 ESSENTIAL VOCABULARY GUIDE</h2>
+            <p style="color:var(--text-secondary);">43 Contextual Vocabulary Terms extracted from the 6 TKA 2025 Reading Texts.</p>
+          </div>
+          <button class="btn-hero btn-primary" onclick="switchTab('tab-game'); startVocabGame();">
+            🎮 PLAY 10 VOCAB CHALLENGE
+          </button>
+        </div>
+
+        <!-- SEARCH & FILTER CONTROLS -->
+        <div class="vocab-controls">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="vocab-search-input" class="search-input" placeholder="Search vocabulary (e.g. digital, mindful, impulsive)...">
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-btn active" data-text-id="ALL">ALL TEXTS</button>
+            <button class="filter-btn" data-text-id="text-1">Text 1</button>
+            <button class="filter-btn" data-text-id="text-2">Text 2</button>
+            <button class="filter-btn" data-text-id="text-3">Text 3</button>
+            <button class="filter-btn" data-text-id="text-4">Text 4</button>
+            <button class="filter-btn" data-text-id="text-5">Text 5</button>
+            <button class="filter-btn" data-text-id="text-6">Text 6</button>
+          </div>
+        </div>
+
+        <!-- VOCABULARY GRID -->
+        <div id="vocab-grid-container" class="vocab-grid">
+          <!-- Rendered by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: VOCAB GAME -->
+    <section id="tab-game" class="tab-content">
+      <div style="margin-bottom:1.5rem; text-align:center;">
+        <h2 style="font-size:2.2rem; font-weight:800; color:#fff;">🎮 10 VOCABULARY HIGH-YIELD CHALLENGE</h2>
+        <p style="color:var(--text-secondary); max-width:700px; margin:0 auto;">Test your mastery of 10 essential vocabulary items from the TKA 2025 reading passages. Score points and build streak multipliers!</p>
+      </div>
+
+      <div id="game-workspace" class="game-container">
+        <!-- Rendered by app.js (Start Screen, Game Round, or Game Result) -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p><strong>SOURCE OF TRUTH:</strong> TKA Bahasa Inggris SMA/MA/SMK Tahun 2025 • High-Yield Assessment & Masterclass</p>
+    <p style="margin-top:0.4rem; font-size:0.8rem;">Vocabulary reference: Pembahasan Soal TKA Bahasa Inggris 2025 & Vocabulary Analysis PPT Guide</p>
+  </footer>
+
+  <!-- DATA & APP LOGIC SCRIPTS -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
